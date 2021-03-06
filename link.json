@@ -1,0 +1,23 @@
+{
+"states": [
+    { 
+        "name":"johor" , 
+        "command":"view_johor" }, 
+
+    { 
+        "name":"selangor" , 
+        "command":"view_selangor" }, 
+
+    { 
+        "name":"melaka" , 
+        "command":"view_melaka" }, 
+
+    { 
+        "name":"kuala lumpur" , 
+        "command":"view_kl" }, 
+
+    { 
+        "name":"penang" , 
+        "command":"view_penang" }
+    ]
+}
