@@ -16,13 +16,14 @@
 				<div class="col-lg-12">
 			  <label for="overview" class="col-lg-6 labelText">Add your link:</label>
 			  <input type="url" class="col-lg-6" id="overview" name="overview" required placeholder="Enter Url"></div>
-			  <div class="col-lg-12">
-			  	<p id="errorMessage" class="hideMessage"><span class="col-lg-6"></span><span class="col-lg-6">Please add a valid URL</span></p>
+			  <div class="col-lg-12 hideMessage" id="errorMessage">
+			  	<div class="col-lg-6"></div>
+			  	<div class="col-lg-2 displayMessageError">Please add a valid URL</div>
 			  </div>
 			  <div class="col-lg-12" style="margin-top:20px;">
-			  	<div class="col-lg-6"></div>
+			  	<div class="col-lg-5"></div>
 			  	<button type="submit" class="submit col-lg-2" onclick="checkURL()" >Submit</button>
-			  	<div class="col-lg-4"></div>
+			  	<div class="col-lg-5"></div>
 			  </div>
 			   
 			</form>
@@ -36,10 +37,12 @@
 			<div class="col-lg-4">
 				
 			</div>
-			<input class="col-lg-1" type="button" id="first" onclick="firstPage()" value="First" />
-		    <input class="col-lg-1" type="button" id="next" onclick="nextPage()" value="Next" />
-		    <input class="col-lg-1" type="button" id="previous" onclick="previousPage()" value="Previous" />
-		    <input class="col-lg-1" type="button" id="last" onclick="lastPage()" value="Last" />
+			<div class="col-lg-4">
+				<input class="" type="button" id="first" onclick="firstPage()" value="First" />
+			    <input class="" type="button" id="next" onclick="nextPage()" value="Next" />
+			    <input class="" type="button" id="previous" onclick="previousPage()" value="Previous" />
+			    <input class="" type="button" id="last" onclick="lastPage()" value="Last" />
+		    </div>
 		    <div class="col-lg-4">
 				
 			</div>

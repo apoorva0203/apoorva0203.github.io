@@ -10,9 +10,8 @@
 .hideMessage{
 	display: none;
 }
-.displayMessage {
+.displayMessageError {
 	display: block;
-    margin-left: 27%;
     border: 1px solid white;
     background-color: white;
     color: red;
@@ -50,6 +49,7 @@ input[type="button"]:disabled {
     color: white;
     border: none;
     margin: 10px 10px;
+    width: 100px;
 }
 
 .labelText{
