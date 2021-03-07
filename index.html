@@ -4,20 +4,30 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>Overview Page</title>
 	<link rel="stylesheet" href="./style.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 	<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
 	<script src="./script.js" type="text/javascript" charset="utf-8" async defer></script>
+	<script src="./pagination.min.js" type="text/javascript" charset="utf-8" async defer></script>
 </head>
 <body onload="update()">
-	<h1>Display a URL Input Field</h1>
-
-	<form>
-	  <label for="overview">Add your link:</label>
-	  <input type="url" id="overview" name="overview" required placeholder="Enter Url"><br><br>
-	  <p id="errorMessage" class="hideMessage">Please add a valid URL</p>
-	  <button type="submit" onclick="checkURL();return false;" >Submit</button> 
-	</form>
-	<ul id="myList">
-		<li></li>
-	</ul>
+	<div class="container">
+		<form>
+		  <label for="overview">Add your link:</label>
+		  <input type="url" id="overview" name="overview" required placeholder="Enter Url"><br><br>
+		  <p id="errorMessage" class="hideMessage">Please add a valid URL</p>
+		  <button type="submit" class="submit" onclick="checkURL();return false;" >Submit</button> 
+		</form>
+		<div id="demo">
+			<ul id="myList">
+				<li class='urls'></li>
+			</ul>
+		</div>                
+		<div>
+			<input type="button" id="first" onclick="firstPage()" value="first" />
+		    <input type="button" id="next" onclick="nextPage()" value="next" />
+		    <input type="button" id="previous" onclick="previousPage()" value="previous" />
+		    <input type="button" id="last" onclick="lastPage()" value="last" />
+		</div>
+	</div>
 </body>
 </html>

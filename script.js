@@ -46,12 +46,16 @@ function updateList(list){
       for(var i=0; i < updatedLinks.length; i++){ 
         var item = updatedLinks[i]; 
         if(item !== undefined){
-          buffer+=" <li><a href='"+item+"' target='_blank'>"+item+"</a></li>"; 
+          buffer+=" <li class='urls'><a href='"+item+"' target='_blank'>"+item+"</a></li>"; 
       
         }
       } 
-      $('ul').html(buffer);
+      $('#myList').html(buffer);
+      
+      
   }
+
+
 
 function validURL(str) {
   var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
@@ -96,4 +100,72 @@ function checkURL(){
 function update(){
     var bla = $('#overview').val();
     load(bla)
+}
+    var list = new Array();
+    var pageList = new Array();
+    var currentPage = 1;
+    var numberPerPage = 20;
+    var numberOfPages = 0;
+
+function makeList() {
+    var initialLinks = ["yahoo.com","yahoo.com","yahoo.com", "yahoo.com","yahoo.com" ];
+  var local = localStorage.getItem("storedLinks");
+  if(local !== null){
+    list = JSON.parse(local);
+  }else{
+    list = initialLinks;
+  }
+    numberOfPages = getNumberOfPages();
+}
+    
+function getNumberOfPages() {
+    return Math.ceil(list.length / numberPerPage);
+}
+
+function nextPage() {
+    currentPage += 1;
+    loadList();
+}
+
+function previousPage() {
+    currentPage -= 1;
+    loadList();
+}
+
+function firstPage() {
+    currentPage = 1;
+    loadList();
+}
+
+function lastPage() {
+    currentPage = numberOfPages;
+    loadList();
+}
+
+function loadList() {
+    var begin = ((currentPage - 1) * numberPerPage);
+    var end = begin + numberPerPage;
+
+    pageList = list.slice(begin, end);
+    drawList();
+    check();
+}
+    
+function drawList() {
+    document.getElementById("myList").innerHTML = "";
+    for (r = 0; r < pageList.length; r++) {
+        document.getElementById("myList").innerHTML += "<li class='urls'><a href='"+pageList[r]+"' target='_blank'>"+pageList[r]+"</a></li> ";
+    }
+}
+
+function check() {
+    document.getElementById("next").disabled = currentPage == numberOfPages ? true : false;
+    document.getElementById("previous").disabled = currentPage == 1 ? true : false;
+    document.getElementById("first").disabled = currentPage == 1 ? true : false;
+    document.getElementById("last").disabled = currentPage == numberOfPages ? true : false;
+}
+
+function load() {
+    makeList();
+    loadList();
 }
