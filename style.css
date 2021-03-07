@@ -76,6 +76,10 @@ form {
   margin: 0 auto;
   width: 232px;
 }
+.edit{
+	padding-right: 10px;
+	color: #fff;
+}
 input[type="button"]:disabled {
   background: #dddddd;
 }
@@ -86,7 +90,9 @@ input[type="button"]:disabled {
   margin: 10px 10px;
   width: 100px;
 }
-
+.material-icons{
+	font-size: 16px !important;
+}
 .labelText{
   text-align: right;
 }

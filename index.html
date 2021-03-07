@@ -5,9 +5,12 @@
 	<title>Overview Page</title>
 	<link rel="stylesheet" href="./style.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 	<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
 	<script src="./script.js" type="text/javascript" charset="utf-8" async defer></script>
 	<script src="./pagination.min.js" charset="utf-8" async defer></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body onload="update()">
 	<div class="container main col-lg-12">
@@ -47,6 +50,48 @@
 				
 			</div>
 		</div>
+	</div>
+	<div id="myModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Edit your Link</h4>
+	      </div>
+	      <div class="modal-body">
+	        <input id="editUrl" />
+	        
+	      </div>
+	      <div class="modal-footer">
+	      	<button type="submit" class="submit col-lg-2" onclick="updateUrl()" data-dismiss="modal">Update</button>
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+
+	  </div>
+	</div>
+	<div id="myModal1" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Are you sure you want to delete?</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p id="deleteUrls"></p>
+	        
+	      </div>
+	      <div class="modal-footer">
+	      	<button type="button" class="submit col-lg-2" onclick="deleteAndUpdateUrl()" data-dismiss="modal">Delete</button>
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+
+	  </div>
 	</div>
 </body>
 </html>
