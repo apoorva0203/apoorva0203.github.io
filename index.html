@@ -10,23 +10,39 @@
 	<script src="./pagination.min.js" type="text/javascript" charset="utf-8" async defer></script>
 </head>
 <body onload="update()">
-	<div class="container">
-		<form>
-		  <label for="overview">Add your link:</label>
-		  <input type="url" id="overview" name="overview" required placeholder="Enter Url"><br><br>
-		  <p id="errorMessage" class="hideMessage">Please add a valid URL</p>
-		  <button type="submit" class="submit" onclick="checkURL();return false;" >Submit</button> 
-		</form>
-		<div id="demo">
+	<div class="container main col-lg-12">
+		<div style="margin:200px auto 50px auto;" class="col-lg-12">
+			<form id="myForm">
+				<div class="col-lg-12">
+			  <label for="overview" class="col-lg-6 labelText">Add your link:</label>
+			  <input type="url" class="col-lg-6" id="overview" name="overview" required placeholder="Enter Url"></div>
+			  <div class="col-lg-12">
+			  	<p id="errorMessage" class="hideMessage"><span class="col-lg-6"></span><span class="col-lg-6">Please add a valid URL</span></p>
+			  </div>
+			  <div class="col-lg-12" style="margin-top:20px;">
+			  	<div class="col-lg-6"></div>
+			  	<button type="submit" class="submit col-lg-2" onclick="checkURL()" >Submit</button>
+			  	<div class="col-lg-4"></div>
+			  </div>
+			   
+			</form>
+		</div>
+		<div id="demo" class="col-lg-12">
 			<ul id="myList">
 				<li class='urls'></li>
 			</ul>
 		</div>                
-		<div>
-			<input type="button" id="first" onclick="firstPage()" value="first" />
-		    <input type="button" id="next" onclick="nextPage()" value="next" />
-		    <input type="button" id="previous" onclick="previousPage()" value="previous" />
-		    <input type="button" id="last" onclick="lastPage()" value="last" />
+		<div class="footer col-lg-12" >
+			<div class="col-lg-4">
+				
+			</div>
+			<input class="col-lg-1" type="button" id="first" onclick="firstPage()" value="First" />
+		    <input class="col-lg-1" type="button" id="next" onclick="nextPage()" value="Next" />
+		    <input class="col-lg-1" type="button" id="previous" onclick="previousPage()" value="Previous" />
+		    <input class="col-lg-1" type="button" id="last" onclick="lastPage()" value="Last" />
+		    <div class="col-lg-4">
+				
+			</div>
 		</div>
 	</div>
 </body>

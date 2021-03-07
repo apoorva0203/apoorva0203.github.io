@@ -1,12 +1,17 @@
 
-
+var firstLink = "https://yahoo.com";
+var createLinks = [];
+for(i=0; i<20; i++){
+  createLinks.push(firstLink);
+}
 function load(newLink){
-  var initialLinks = ["yahoo.com","yahoo.com","yahoo.com", "yahoo.com","yahoo.com" ];
+  var initialLinks = createLinks;
     if(newLink !== ""){
       var newSet = [];
       var storedLinks = JSON.parse(localStorage.getItem("storedLinks"));
       if(storedLinks !== null){
         storedLinks.push(newLink);
+        localStorage.setItem("url", newLink);
         localStorage.setItem("storedLinks", JSON.stringify(storedLinks));
         pushedLink();
       } else {
@@ -20,11 +25,12 @@ function load(newLink){
       unpushedLink();
     }
     
-    
+    makeList();
+    loadList();
     
 }
 function unpushedLink(){
-  var initialLinks = ["yahoo.com","yahoo.com","yahoo.com", "yahoo.com","yahoo.com" ];
+  var initialLinks = createLinks;
   var local = localStorage.getItem("storedLinks");
   if(local !== null){
     updateList(JSON.parse(local));
@@ -36,7 +42,7 @@ function unpushedLink(){
 }
 
 function pushedLink(){
-  var link = localstorage.getItem("storedLinks");
+  var link = localStorage.getItem("storedLinks");
     updateList(JSON.parse(link));
 }
 function updateList(list){
@@ -83,10 +89,13 @@ function checkURL(){
   var bla = $('#overview').val();
   const url = document.getElementById("overview");
     if(validURL(bla) && isValidHttpUrl(bla)){
+      
       $('#overview').addClass('success');
       $("#errorMessage").removeClass('displayMessage');
       $("#errorMessage").addClass('hideMessage');
       url.setCustomValidity("");
+      document.getElementById("myForm").action = "./review.html";
+      
       update();
     }else{
       $('#overview').addClass('error');
@@ -96,7 +105,13 @@ function checkURL(){
       url.setCustomValidity("I am expecting an e-mail address!");
     }
 }
-
+function review(){
+  var returnedUrl =localStorage.getItem('url');
+  document.getElementById("reviewUrl").innerHTML = returnedUrl;
+}
+function returnButton(){
+  window.history.back();
+}
 function update(){
     var bla = $('#overview').val();
     load(bla)
@@ -108,7 +123,7 @@ function update(){
     var numberOfPages = 0;
 
 function makeList() {
-    var initialLinks = ["yahoo.com","yahoo.com","yahoo.com", "yahoo.com","yahoo.com" ];
+    var initialLinks = createLinks;
   var local = localStorage.getItem("storedLinks");
   if(local !== null){
     list = JSON.parse(local);
@@ -165,7 +180,3 @@ function check() {
     document.getElementById("last").disabled = currentPage == numberOfPages ? true : false;
 }
 
-function load() {
-    makeList();
-    loadList();
-}
