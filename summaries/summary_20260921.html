@@ -14,7 +14,24 @@
   .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
   .header .date { font-size: 13px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
   .body { padding: 20px 22px 24px; }
-  .section { margin: 0 0 14px 0; padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; transition: background 0.15s; }
+
+  /* Desktop horizontal layout */
+  @media (min-width: 768px) {
+    .body { display: flex; flex-wrap: wrap; gap: 14px; padding: 20px 24px 24px; }
+    .section { flex: 1 1 260px; min-width: 240px; margin: 0; }
+    .section-work { flex: 1 1 100%; order: -1; }
+    .header { padding: 28px 32px; }
+    .header h1 { font-size: 26px; }
+    .footer { padding: 12px 24px; }
+  }
+
+  /* Mobile: vertical stack (default) */
+  @media (max-width: 767px) {
+    .body { padding: 20px 22px 24px; }
+    .section { margin: 0 0 14px 0; }
+  }
+
+  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; transition: background 0.15s; flex: 1 1 280px; min-width: 260px; margin: 0 0 14px 0; }
   .section:hover { background: #f1f5f9; }
   .section-cal { border-left: 4px solid #3b82f6; }
   .section-rem { border-left: 4px solid #10b981; }
@@ -72,7 +89,7 @@
                 <span class="icon">📅</span>
                 <span class="label">📅 Calendar</span>
             </div>
-            <div class="content">Calendar: Command '['osascript', '-e', 'tell application "Calendar"\n    set todayStart to date "2026 9 21 00:00:00"\n    set todayEnd to date "2026 9 22 00:00:00"\n    set events_list to {}\n    repeat with c in calendars\n        try\n            set cEvents to events of c where start date &gt;= todayStart and start date &lt; todayEnd\n            repeat with e in cEvents\n                set end of events_list to {summary of e, start date of e, calendar name of e}\n            end repeat\n        end try\n    end repeat\n    events_list\nend tell']' timed out after 15 seconds</div>
+            <div class="content"><p class="empty">No calendar events today</p></div>
         </div>
         <div class="section section-rem">
             <div class="section-header">
@@ -86,11 +103,11 @@
                 <span class="icon">📧</span>
                 <span class="label">📧 Email</span>
             </div>
-            <div class="content">• Re: Confirmation: Private Class for Dheera — Mylene Nguyen Vo
+            <div class="content">• =?UTF-8?B?4pqhNTAlIE9mZiAxMDArIFN0eWxlcyB8IFRvbmlnaHQgT25seQ==?= — "Taking Shape"
+• Re: Confirmation: Private Class for Dheera — Mylene Nguyen Vo
 • Apoorva, Discover Parkview's 2-bed penthouse — Norus Projects
 • 🐕 Butterscotch_has_a_lot_to_say._Can_you_read_t he_signs? From: Lyka Pet Food &lt;info@lyka.com.au&gt; — Lyka Pet Food
-• Ticket 2856980 Is awaiting your response: City Chic In-Store Stock Availability - Andros Swim Sarong Skirt - black — City Chic
-• =?UTF-8?B?V2XigJl2ZSBnb3QgeW91ciB0cmF2ZWwgcGxhbnMgY292ZXJlZA==?= — "Emirates"</div>
+• Ticket 2856980 Is awaiting your response: City Chic In-Store Stock Availability - Andros Swim Sarong Skirt - black — City Chic</div>
         </div>
         <div class="section section-gh">
             <div class="section-header">
@@ -115,8 +132,6 @@
             <div class="content">Slack (79 channels, last 24h):
 • [design_system_2026] &lt;@U08JGPPJBFS&gt; &lt;@U0A7ECQFF7C&gt; I just realised.. the Payouts settings page isn't it's own page, but it opens up as a full-width drawer, just over the c…
 • [dev-ops] 🔴 Critical priority issue is active
-&lt;<a href="https://radar-api.service.eu.newrelic.com/accounts/3282134/issues/29be4078-69fa-4f5a-9db9-638b26…" target="_blank">https://radar-api.service.eu.newrelic.com/accounts/3282134/issues/29be4078-69fa-4f5a-9db9-638b26…</a>
-• [dev-ops] 🔴 Critical priority issue is active
 &lt;<a href="https://radar-api.service.eu.newrelic.com/accounts/3282134/issues/3f3b4fc6-4c36-4af5-a198-4b1a8e…" target="_blank">https://radar-api.service.eu.newrelic.com/accounts/3282134/issues/3f3b4fc6-4c36-4af5-a198-4b1a8e…</a>
 • [eng_general] *Pending review on syncio/syncio-be* - &lt;<a href="https://github.com/organizations/syncio/settings/reminders/102011|Manage" target="_blank">https://github.com/organizations/syncio/settings/reminders/102011|Manage</a> reminder&gt;  [#88] &lt;<a href="https://github.com/…" target="_blank">https://github.com/…</a>
 • [eng_general] *Pending review on syncio/syncio-fe* - &lt;<a href="https://github.com/organizations/syncio/settings/reminders/102011|Manage" target="_blank">https://github.com/organizations/syncio/settings/reminders/102011|Manage</a> reminder&gt;  [#74] &lt;<a href="https://github.com/…" target="_blank">https://github.com/…</a>
@@ -132,7 +147,8 @@ No results from all experiment campaigns. Noteworthy changes:
 • [infra-upgrade] @Apoorv Singh created an update
 • [proj-ai] The Golden Rule of AI: Don’t use AI to save yourself time by wasting someone else’s.
 • [proj-analytics] hey &lt;!here&gt; how have we been calculating &amp;amp; reporting on Revenue every month? Is there a report to download anywhere, or perhaps a formula to calcu…
-• [proj-analytics] hey &lt;!here&gt; upon going through data for Plans &amp; Upgrades i saw a lot (around 100ish) of our SS users are at "Essential" plan. I don't see this at both…</div>
+• [proj-analytics] hey &lt;!here&gt; upon going through data for Plans &amp; Upgrades i saw a lot (around 100ish) of our SS users are at "Essential" plan. I don't see this at both…
+• [team_general] Hey team, I've woken up with a migraine so will also take the day off to avoid screens. &lt;@U01S73A9HCH&gt; would it be possible to reschedule the AI hango…</div>
         </div>
         <div class="section section-work">
             <div class="section-header">
@@ -157,7 +173,7 @@ No results from all experiment campaigns. Noteworthy changes:
 • - Direct Cranes milestone 1: Apoorva adds a crew email + Create login in prod, runs `~/Desktop/direct-cranes-milestone-1-sachin-checklist.md`, sends with the $1,500 invoice (not conditional on his test). Prod: 1 login (it@), 0 docket logins. Week-3 variations (calendar) + owed confirmation prompts in handover.</div></div>
         </div>
   </div>
-  <div class="footer">Generated by Hermes · 15:33</div>
+  <div class="footer">Generated by Hermes · 15:38</div>
 </div>
 <script>
 (function() {
