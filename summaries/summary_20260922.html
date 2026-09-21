@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☀️ Morning Summary</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%); color: #1a1a2e; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 600px; margin: 0 auto 20px; background: #ffffff; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 24px 28px; position: relative; overflow: hidden; }
+  .header::after { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+  .header::before { content: ''; position: absolute; bottom: -30px; left: 20%; width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+  .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .header .date { font-size: 13px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
+  .body { padding: 16px 16px 20px; }
+  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; margin: 0 0 14px 0; min-width: 0; }
+  .section:last-child { margin-bottom: 0; }
+
+  /* Desktop: two columns, work sections full width on top */
+  @media (min-width: 768px) {
+    body { padding: 24px; }
+    .page { max-width: 1100px; }
+    .body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 24px 24px; align-items: start; }
+    .section { margin: 0; }
+    .section-work, .section-gh, .section-slack { grid-column: 1 / -1; }
+    .section-work { order: -1; }
+    .header { padding: 28px 32px; }
+    .header h1 { font-size: 26px; }
+    .footer { padding: 12px 24px; }
+  }
+  .section-cal { border-left: 4px solid #3b82f6; }
+  .section-rem { border-left: 4px solid #10b981; }
+  .section-email { border-left: 4px solid #f59e0b; }
+  .section-slack { border-left: 4px solid #8b5cf6; }
+  .section-work { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-color: #fcd34d; }
+  .section-gh { border-left: 4px solid #ef4444; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+  .section-header .icon { font-size: 16px; }
+  .section-header .label { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: #475569; }
+  .content { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #334155; }
+  .content ul { white-space: normal; margin: 0 0 12px; padding-left: 18px; }
+  .content ul:last-child { margin-bottom: 0; }
+  .content li { margin: 0 0 6px; }
+  .content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: rgba(15,23,42,0.06); padding: 1px 5px; border-radius: 4px; }
+  .work-list { font-size: 13px; line-height: 1.55; color: #44403c; }
+  .content a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+  .content a:hover { text-decoration: underline; }
+  .content .mention { color: #8b5cf6; font-weight: 500; }
+  .empty { color: #94a3b8; font-style: italic; font-size: 13px; text-align: center; padding: 8px 0; }
+  .work-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .work-tag.done { background: #dcfce7; color: #166534; }
+  .work-tag.open { background: #fee2e2; color: #991b1b; }
+  .work-tag.progress { background: #fef9c3; color: #854d0e; }
+  .work-items { white-space: normal; font-size: 13px; line-height: 1.55; color: #44403c; margin: 0 0 12px; }
+  .work-items:last-child { margin-bottom: 0; }
+  .footer { text-align: center; padding: 10px 22px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+  .pwd-gate { position: fixed; inset: 0; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .pwd-gate .box { background: #ffffff; border-radius: 16px; padding: 36px 32px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 300px; width: 90%; }
+  .pwd-gate h2 { margin: 0 0 4px; font-size: 20px; color: #1a1a2e; font-weight: 700; }
+  .pwd-gate .lock-icon { font-size: 40px; margin-bottom: 8px; display: block; }
+  .pwd-gate p { font-size: 13px; color: #64748b; margin: 0 0 24px; }
+  .pwd-gate input { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; box-sizing: border-box; margin-bottom: 14px; transition: border-color 0.15s; }
+  .pwd-gate input:focus { outline: none; border-color: #4f46e5; }
+  .pwd-gate button { width: 100%; padding: 11px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .pwd-gate button:hover { background: #4338ca; }
+  .pwd-gate .error { color: #ef4444; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 500; }
+  .page { display: none; }
+</style>
+</head>
+<body>
+<div class="pwd-gate" id="pwdGate">
+  <div class="box">
+    <span class="lock-icon">🔒</span>
+    <h2>Locked</h2>
+    <p>Enter your morning summary password</p>
+    <input type="password" id="pwdInput" placeholder="Password" autocomplete="off">
+    <button id="pwdBtn">Unlock</button>
+    <div class="error" id="pwdError"></div>
+  </div>
+</div>
+<div class="page" id="summaryPage">
+  <div class="header">
+    <h1>☀️ Morning Summary</h1>
+    <div class="date">Tuesday, September 22</div>
+  </div>
+  <div class="body">
+    
+        <div class="section section-cal">
+            <div class="section-header">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </div>
+            <div class="content"><p class="empty">No answer from Calendar (timed out)</p></div>
+        </div>
+        <div class="section section-rem">
+            <div class="section-header">
+                <span class="icon">✅</span>
+                <span class="label">Reminders</span>
+            </div>
+            <div class="content">Reminders: Command '['remindctl', 'today']' timed out after 10 seconds</div>
+        </div>
+        <div class="section section-email">
+            <div class="section-header">
+                <span class="icon">📧</span>
+                <span class="label">Email</span>
+            </div>
+            <div class="content">Email: command: FETCH =&gt; socket error: EOF</div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub PRs</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Open PRs with pending review</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/101" target="_blank" rel="noopener">#101 ENG-5008: wrap payouts, products and dashboard copy, and land the translations (4/10)</a> — 💬 Reviewed by: nainesh-syncio (4 commits, +6594/-1153)</li><li><a href="https://github.com/syncio/syncio-fe/pull/100" target="_blank" rel="noopener">#100 ENG-5008: wrap registration, settings and catalogue copy (3/10)</a> — 👀 Review: jaiwalker, softfish (2 commits, +1533/-1177)</li><li><a href="https://github.com/syncio/syncio-fe/pull/99" target="_blank" rel="noopener">#99 ENG-5008: wrap shared component and marketplace copy (2/10)</a> — 💬 Reviewed by: apoorva0203, nainesh-syncio (10 commits, +1867/-799)</li><li><a href="https://github.com/syncio/syncio-fe/pull/92" target="_blank" rel="noopener">#92 ENG-5008: catch bare copy inside template expressions (6/10)</a> — 💬 Reviewed by: nainesh-syncio (15 commits, +676/-110)</li><li><a href="https://github.com/syncio/syncio-fe/pull/91" target="_blank" rel="noopener">#91 ENG-5008: localise dates, Spanish review fixes and the language record (5/10)</a> — 👀 Review: softfish (7 commits, +2523/-1333)</li><li><a href="https://github.com/syncio/syncio-fe/pull/90" target="_blank" rel="noopener">#90 [ENG-5054] cancel stale InventoryCounter fetches on Source Store switch</a> — 💬 Reviewed by: nainesh-syncio, apoorva0203, jaiwalker (4 commits, +14/-4)</li><li><a href="https://github.com/syncio/syncio-fe/pull/88" target="_blank" rel="noopener">#88 Feature/eng 5044 payout setup dialog crash</a> (3 commits, +441/-61)</li><li><a href="https://github.com/syncio/syncio-fe/pull/74" target="_blank" rel="noopener">#74 ENG-5008: localisation slot and language settings (1/10)</a> — 👀 Review: softfish (29 commits, +2126/-14)</li></ul></div>
+        </div>
+        <div class="section section-slack">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">Slack</span>
+            </div>
+            <div class="content"><div class="work-tag progress">79 channels · last 24h</div><ul class="work-list"><li><strong>#design_system_2026</strong> <span class="mention">@U08JGPPJBFS</span> <span class="mention">@U0A7ECQFF7C</span> I just realised.. the Payouts settings page isn't it's own page, but it opens up as a full-width drawer, just over the current page the user is on. Is this correct?</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> - <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#88] …</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-fe</strong> - <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#74] …</li><li><strong>#growth_projects</strong> <strong>A/B TEST RESULTS + LEARNINGS</strong> <strong>Winning combination</strong> • (1) Feature-oriented CTA subjectline. Winning ver → <a href="https://us18.campaign-archive.com/?u=d3876b95496c25d2e8d7568bb&id=c588b102e1" target="_blank" rel="noopener">here</a> • (2) hea…</li><li><strong>#growth_projects</strong> <strong>W3 CHECKPOINT - SHOPIFY ADS</strong> No results from all experiment campaigns. Noteworthy changes: • [CAT} Bulk editor: all-time CPI increases from $16 to $22. Still under benchmark (CAT Inventory Sync $24.0…</li><li><strong>#infra-upgrade</strong> @Apoorv Singh created an update</li><li><strong>#infra-upgrade</strong> @Apoorv Singh created an update</li><li><strong>#pm_general</strong> Just noticed a broken link on this page (viewing a payout setting as SS). Links to here: <a href="https://help.syncio.co/en/articles/7325099-payouts-101" target="_blank" rel="noopener">help.syncio.co/en/articles/7325099-payouts-101</a> Any clu…</li><li><strong>#pm_market</strong> Appstore fun and games… <a href="https://lnkd.in/p/gJ4knV2H" target="_blank" rel="noopener">https://lnkd.in/p/gJ4knV2H</a></li><li><strong>#proj-analytics</strong> hey <span class="mention">@here</span> how have we been calculating &amp; reporting on Revenue every month? Is there a report to download anywhere, or perhaps a formula to calculate from a certain source?</li><li><strong>#proj-analytics</strong> hey <span class="mention">@here</span> upon going through data for Plans & Upgrades i saw a lot (around 100ish) of our SS users are at "Essential" plan. I don't see this at both DS or SS pricing page. Can someone fill me in on …</li><li><strong>#team_general</strong> <span class="mention">@here</span> I have moved the AI Hangout to Tuesday same time. Apologies.</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Syncio — Professional</span>
+            </div>
+            <div class="content"><div class="work-tag done">Fri 18 Sep</div><ul class="work-list"><li>Switched default model to Fable 5.1 (same weekly bucket as Opus on Max; no quota relief, just slower burn).</li><li>Context reconstructed and this note rewritten.</li><li><strong>Apoorva confirmed the <code>interface_locale</code> row is in every DB</strong> — the deploy gate for #74 is cleared.</li></ul><div class="work-tag open">STILL OPEN</div><ul class="work-list"><li><strong>ENG-5008:</strong> merge order 74 → 99 → 100 → 101 → 91 → 92; DB row gate cleared 18 Sep (eng-5008-next-steps). Release branch + retargeting #74 owned by someone else. Post-audit leftovers (fragment keys, <code>StoresFilter</code>, ConfirmDialog defaults, lottie flake) are in that note.</li><li>ENG-5044: pushed, PR not opened; lint rule numbering collides with ENG-5008's (eng-5044-payout-overlay).</li><li>Uncarded bugs in main: Woo <code>user_modules</code> (highest value, project_woo_plan_modules_bug); <code>POST /api/user/installation-completed</code> has NO auth middleware; <code>getConfigs</code> autofill '0' store rows shadow user-level '1' via <code>Store::hasConfig</code>; 403 silent logout; IDOR-shaped BE routes; unregistered StoreObserver; payouts date-range ref type.</li><li><code>docs/es-localisation-findings.md</code> untracked in syncio-fe, parked.</li><li>Parked/awaiting others: Dependabot cadence, docs/design-requests vs Jira, store-actions convention, localisation proposition replies, apoorva-site insurance.</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Direct Cranes — Personal</span>
+            </div>
+            <div class="content"><div class="work-tag progress">DIRECT CRANES — LATEST</div><div class="work-items"><strong>21 Sep 2026 late — push notifications + admins + bell + link LIVE.</strong> Planner <code>1b289ca</code> (592 tests) / docket <code>445c54e</code> (343): docket PUSH (0026, <code>webPush.ts</code>, VAPID secrets differ prod/preview, untested on a phone); ADMINS (0025: apoorva yahoo + sachin; only admins delete/make admins); public docket-PDF link (0023); Other role/licence (0024); bell reads <code>/api/notifications</code> (pending leave + a day of clock); receipt scan two-model and WORKING on a phone; Clock screen split + Earlier list;…</div><div class="work-tag open">DIRECT CRANES — STILL OPEN</div><ul class="work-list"><li><strong>Direct Cranes — open after 21 Sep:</strong> phone-test push notifications, passkeys, sign-off PDF upload, IDB persistence; confirm Leave date fields fit; confirm Geoapify suggestions ever appear (else test the key directly); combined 3-milestone checklist for Sachin (not written); handover refresh is current to 21 Sep evening; prod crew still have no emails; the 15 Sep clock patches in ~/direct-cranes-wip are superseded — delete; 4 stale scratch worktrees to prune; receipt model reads the year wrong; variations to bill: passkeys, receipt scan, public link, admins, push.</li><li>Direct Cranes other open: mailto buttons open nothing on Apoorva's Mac (no mail account — not a bug); two 3-second junk clock shifts in test DB (immutable); Cloudflare-sent email is a variation to quote if wanted.</li><li>Direct Cranes milestone 1: Apoorva adds a crew email + Create login in prod, runs <code>~/Desktop/direct-cranes-milestone-1-sachin-checklist.md</code>, sends with the $1,500 invoice (not conditional on his test). Prod: 1 login (it@), 0 docket logins. Week-3 variations (calendar) + owed confirmation prompts in handover.</li></ul></div>
+        </div>
+  </div>
+  <div class="footer">Generated by Hermes · 08:50</div>
+</div>
+<script>
+(function() {
+    var gate = document.getElementById('pwdGate');
+    var page = document.getElementById('summaryPage');
+    var input = document.getElementById('pwdInput');
+    var btn = document.getElementById('pwdBtn');
+    var error = document.getElementById('pwdError');
+    var PASSWORD = 'hermes';
+
+    function tryUnlock() {
+        var val = input.value;
+        if (val === PASSWORD) {
+            gate.style.display = 'none';
+            page.style.display = 'block';
+        } else {
+            error.textContent = 'Wrong password';
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') tryUnlock();
+    });
+    input.focus();
+})();
+</script>
+</body>
+</html>
