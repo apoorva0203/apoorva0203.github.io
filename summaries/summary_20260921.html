@@ -6,33 +6,29 @@
 <title>☀️ Morning Summary</title>
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%); color: #1a1a2e; -webkit-font-smoothing: antialiased; }
+  body { margin: 0; padding: 12px; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%); color: #1a1a2e; -webkit-font-smoothing: antialiased; }
   .page { max-width: 600px; margin: 0 auto 20px; background: #ffffff; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
   .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 24px 28px; position: relative; overflow: hidden; }
   .header::after { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
   .header::before { content: ''; position: absolute; bottom: -30px; left: 20%; width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; }
   .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
   .header .date { font-size: 13px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
-  .body { padding: 20px 22px 24px; }
+  .body { padding: 16px 16px 20px; }
+  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; margin: 0 0 14px 0; min-width: 0; }
+  .section:last-child { margin-bottom: 0; }
 
-  /* Desktop horizontal layout */
+  /* Desktop: two columns, work sections full width on top */
   @media (min-width: 768px) {
-    .body { display: flex; flex-wrap: wrap; gap: 14px; padding: 20px 24px 24px; }
-    .section { flex: 1 1 260px; min-width: 240px; margin: 0; }
-    .section-work { flex: 1 1 100%; order: -1; }
+    body { padding: 24px; }
+    .page { max-width: 1100px; }
+    .body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 24px 24px; align-items: start; }
+    .section { margin: 0; }
+    .section-work, .section-gh, .section-slack { grid-column: 1 / -1; }
+    .section-work { order: -1; }
     .header { padding: 28px 32px; }
     .header h1 { font-size: 26px; }
     .footer { padding: 12px 24px; }
   }
-
-  /* Mobile: vertical stack (default) */
-  @media (max-width: 767px) {
-    .body { padding: 20px 22px 24px; }
-    .section { margin: 0 0 14px 0; }
-  }
-
-  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; transition: background 0.15s; flex: 1 1 280px; min-width: 260px; margin: 0 0 14px 0; }
-  .section:hover { background: #f1f5f9; }
   .section-cal { border-left: 4px solid #3b82f6; }
   .section-rem { border-left: 4px solid #10b981; }
   .section-email { border-left: 4px solid #f59e0b; }
@@ -42,7 +38,12 @@
   .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
   .section-header .icon { font-size: 16px; }
   .section-header .label { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: #475569; }
-  .content { white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: #334155; }
+  .content { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #334155; }
+  .content ul { white-space: normal; margin: 0 0 12px; padding-left: 18px; }
+  .content ul:last-child { margin-bottom: 0; }
+  .content li { margin: 0 0 6px; }
+  .content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: rgba(15,23,42,0.06); padding: 1px 5px; border-radius: 4px; }
+  .work-list { font-size: 13px; line-height: 1.55; color: #44403c; }
   .content a { color: #4f46e5; text-decoration: none; font-weight: 500; }
   .content a:hover { text-decoration: underline; }
   .content .mention { color: #8b5cf6; font-weight: 500; }
@@ -51,7 +52,8 @@
   .work-tag.done { background: #dcfce7; color: #166534; }
   .work-tag.open { background: #fee2e2; color: #991b1b; }
   .work-tag.progress { background: #fef9c3; color: #854d0e; }
-  .work-items { white-space: pre-wrap; font-size: 13px; line-height: 1.55; color: #44403c; }
+  .work-items { white-space: normal; font-size: 13px; line-height: 1.55; color: #44403c; margin: 0 0 12px; }
+  .work-items:last-child { margin-bottom: 0; }
   .footer { text-align: center; padding: 10px 22px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #f8fafc; }
   .pwd-gate { position: fixed; inset: 0; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
   .pwd-gate .box { background: #ffffff; border-radius: 16px; padding: 36px 32px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 300px; width: 90%; }
@@ -87,93 +89,58 @@
         <div class="section section-cal">
             <div class="section-header">
                 <span class="icon">📅</span>
-                <span class="label">📅 Calendar</span>
+                <span class="label">Calendar</span>
             </div>
-            <div class="content"><p class="empty">No calendar events today</p></div>
+            <div class="content"><p class="empty">No answer from Calendar (timed out)</p></div>
         </div>
         <div class="section section-rem">
             <div class="section-header">
                 <span class="icon">✅</span>
-                <span class="label">✅ Reminders</span>
+                <span class="label">Reminders</span>
             </div>
-            <div class="content">• No reminders found</div>
+            <div class="content"><p class="empty">No reminders due today</p></div>
         </div>
         <div class="section section-email">
             <div class="section-header">
                 <span class="icon">📧</span>
-                <span class="label">📧 Email</span>
+                <span class="label">Email</span>
             </div>
-            <div class="content">• =?UTF-8?B?4pqhNTAlIE9mZiAxMDArIFN0eWxlcyB8IFRvbmlnaHQgT25seQ==?= — "Taking Shape"
+            <div class="content">• Apoorva, American Hostage: a very real hostage drama. — Neon
+• ⚡50% Off 100+ Styles | Tonight Only — Taking Shape
 • Re: Confirmation: Private Class for Dheera — Mylene Nguyen Vo
 • Apoorva, Discover Parkview's 2-bed penthouse — Norus Projects
-• 🐕 Butterscotch_has_a_lot_to_say._Can_you_read_t he_signs? From: Lyka Pet Food &lt;info@lyka.com.au&gt; — Lyka Pet Food
-• Ticket 2856980 Is awaiting your response: City Chic In-Store Stock Availability - Andros Swim Sarong Skirt - black — City Chic</div>
+• 🐕 Butterscotch has a lot to say. Can you read the signs? — Lyka Pet Food</div>
         </div>
         <div class="section section-gh">
             <div class="section-header">
                 <span class="icon">🔗</span>
-                <span class="label">🔗 GitHub PRs</span>
+                <span class="label">GitHub PRs</span>
             </div>
-            <div class="content">Open PRs with pending review:
-• <a href='https://github.com/syncio/syncio-fe/pull/101'>#101 ENG-5008: wrap payouts, products and dashboard copy, and land the translations (4/10)</a> — 💬 Reviewed by: github-actions, github-actions, github-actions (4 commits, +6594/-1153)
-• <a href='https://github.com/syncio/syncio-fe/pull/100'>#100 ENG-5008: wrap registration, settings and catalogue copy (3/10)</a> — 👀 Review: jaiwalker, softfish, nainesh-syncio (2 commits, +1533/-1177)
-• <a href='https://github.com/syncio/syncio-fe/pull/99'>#99 ENG-5008: wrap shared component and marketplace copy (2/10)</a> — 💬 Reviewed by: github-actions, github-actions, github-actions (10 commits, +1867/-799)
-• <a href='https://github.com/syncio/syncio-fe/pull/92'>#92 ENG-5008: catch bare copy inside template expressions (6/10)</a> — 💬 Reviewed by: github-actions, github-actions (15 commits, +676/-110)
-• <a href='https://github.com/syncio/syncio-fe/pull/91'>#91 ENG-5008: localise dates, Spanish review fixes and the language record (5/10)</a> — 👀 Review: softfish, nainesh-syncio (7 commits, +2523/-1333)
-• <a href='https://github.com/syncio/syncio-fe/pull/90'>#90 [ENG-5054] cancel stale InventoryCounter fetches on Source Store switch</a> — 💬 Reviewed by: github-actions, nainesh-syncio, apoorva0203 (4 commits, +14/-4)
-• <a href='https://github.com/syncio/syncio-fe/pull/88'>#88 Feature/eng 5044 payout setup dialog crash</a> (3 commits, +441/-61)
-• <a href='https://github.com/syncio/syncio-fe/pull/74'>#74 ENG-5008: localisation slot and language settings (1/10)</a> — 👀 Review: softfish, nainesh-syncio (29 commits, +2126/-14)</div>
+            <div class="content"><div class="work-tag progress">Open PRs with pending review</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/101" target="_blank" rel="noopener">#101 ENG-5008: wrap payouts, products and dashboard copy, and land the translations (4/10)</a> (4 commits, +6594/-1153)</li><li><a href="https://github.com/syncio/syncio-fe/pull/100" target="_blank" rel="noopener">#100 ENG-5008: wrap registration, settings and catalogue copy (3/10)</a> — 👀 Review: jaiwalker, softfish, nainesh-syncio (2 commits, +1533/-1177)</li><li><a href="https://github.com/syncio/syncio-fe/pull/99" target="_blank" rel="noopener">#99 ENG-5008: wrap shared component and marketplace copy (2/10)</a> — 💬 Reviewed by: apoorva0203 (10 commits, +1867/-799)</li><li><a href="https://github.com/syncio/syncio-fe/pull/92" target="_blank" rel="noopener">#92 ENG-5008: catch bare copy inside template expressions (6/10)</a> (15 commits, +676/-110)</li><li><a href="https://github.com/syncio/syncio-fe/pull/91" target="_blank" rel="noopener">#91 ENG-5008: localise dates, Spanish review fixes and the language record (5/10)</a> — 👀 Review: softfish, nainesh-syncio (7 commits, +2523/-1333)</li><li><a href="https://github.com/syncio/syncio-fe/pull/90" target="_blank" rel="noopener">#90 [ENG-5054] cancel stale InventoryCounter fetches on Source Store switch</a> — 💬 Reviewed by: nainesh-syncio, apoorva0203, jaiwalker (4 commits, +14/-4)</li><li><a href="https://github.com/syncio/syncio-fe/pull/88" target="_blank" rel="noopener">#88 Feature/eng 5044 payout setup dialog crash</a> (3 commits, +441/-61)</li><li><a href="https://github.com/syncio/syncio-fe/pull/74" target="_blank" rel="noopener">#74 ENG-5008: localisation slot and language settings (1/10)</a> — 👀 Review: softfish, nainesh-syncio (29 commits, +2126/-14)</li></ul></div>
         </div>
         <div class="section section-slack">
             <div class="section-header">
                 <span class="icon">💬</span>
-                <span class="label">💬 Slack</span>
+                <span class="label">Slack</span>
             </div>
-            <div class="content">Slack (79 channels, last 24h):
-• [design_system_2026] &lt;@U08JGPPJBFS&gt; &lt;@U0A7ECQFF7C&gt; I just realised.. the Payouts settings page isn't it's own page, but it opens up as a full-width drawer, just over the c…
-• [dev-ops] 🔴 Critical priority issue is active
-&lt;<a href="https://radar-api.service.eu.newrelic.com/accounts/3282134/issues/3f3b4fc6-4c36-4af5-a198-4b1a8e…" target="_blank">https://radar-api.service.eu.newrelic.com/accounts/3282134/issues/3f3b4fc6-4c36-4af5-a198-4b1a8e…</a>
-• [eng_general] *Pending review on syncio/syncio-be* - &lt;<a href="https://github.com/organizations/syncio/settings/reminders/102011|Manage" target="_blank">https://github.com/organizations/syncio/settings/reminders/102011|Manage</a> reminder&gt;  [#88] &lt;<a href="https://github.com/…" target="_blank">https://github.com/…</a>
-• [eng_general] *Pending review on syncio/syncio-fe* - &lt;<a href="https://github.com/organizations/syncio/settings/reminders/102011|Manage" target="_blank">https://github.com/organizations/syncio/settings/reminders/102011|Manage</a> reminder&gt;  [#74] &lt;<a href="https://github.com/…" target="_blank">https://github.com/…</a>
-• [growth_projects] *A/B TEST RESULTS + LEARNINGS*
-
-*Winning combination*
-• (1) Feature-oriented CTA subjectline. Winning ver → &lt;<a href="https://us18.campaign-archive.com/?u=d387…" target="_blank">https://us18.campaign-archive.com/?u=d387…</a>
-• [growth_projects] *W3 CHECKPOINT - SHOPIFY ADS*
-
-No results from all experiment campaigns. Noteworthy changes:
-• [CAT} Bulk editor: all-time CPI increases from $16 to $…
-• [infra-upgrade] @Apoorv Singh created an update
-• [infra-upgrade] @Apoorv Singh created an update
-• [proj-ai] The Golden Rule of AI: Don’t use AI to save yourself time by wasting someone else’s.
-• [proj-analytics] hey &lt;!here&gt; how have we been calculating &amp;amp; reporting on Revenue every month? Is there a report to download anywhere, or perhaps a formula to calcu…
-• [proj-analytics] hey &lt;!here&gt; upon going through data for Plans &amp; Upgrades i saw a lot (around 100ish) of our SS users are at "Essential" plan. I don't see this at both…
-• [team_general] Hey team, I've woken up with a migraine so will also take the day off to avoid screens. &lt;@U01S73A9HCH&gt; would it be possible to reschedule the AI hango…</div>
+            <div class="content"><div class="work-tag progress">79 channels · last 24h</div><ul class="work-list"><li><strong>#design_system_2026</strong> <span class="mention">@U08JGPPJBFS</span> <span class="mention">@U0A7ECQFF7C</span> I just realised.. the Payouts settings page isn't it's own page, but it opens up as a full-width drawer, just over the current page the user is on. Is this correct?</li><li><strong>#dev-ops</strong> 🔴 Critical priority issue is active …</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> - <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#88] …</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-fe</strong> - <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#74] …</li><li><strong>#growth_projects</strong> <strong>A/B TEST RESULTS + LEARNINGS</strong> <strong>Winning combination</strong> • (1) Feature-oriented CTA subjectline. Winning ver → <a href="https://us18.campaign-archive.com/?u=d3876b95496c25d2e8d7568bb&id=c588b102e1" target="_blank" rel="noopener">here</a> • (2) hea…</li><li><strong>#growth_projects</strong> <strong>W3 CHECKPOINT - SHOPIFY ADS</strong> No results from all experiment campaigns. Noteworthy changes: • [CAT} Bulk editor: all-time CPI increases from $16 to $22. Still under benchmark (CAT Inventory Sync $24.0…</li><li><strong>#infra-upgrade</strong> @Apoorv Singh created an update</li><li><strong>#infra-upgrade</strong> @Apoorv Singh created an update</li><li><strong>#proj-ai</strong> The Golden Rule of AI: Don’t use AI to save yourself time by wasting someone else’s.</li><li><strong>#proj-analytics</strong> hey <span class="mention">@here</span> how have we been calculating &amp; reporting on Revenue every month? Is there a report to download anywhere, or perhaps a formula to calculate from a certain source?</li><li><strong>#proj-analytics</strong> hey <span class="mention">@here</span> upon going through data for Plans & Upgrades i saw a lot (around 100ish) of our SS users are at "Essential" plan. I don't see this at both DS or SS pricing page. Can someone fill me in on …</li><li><strong>#team_general</strong> Hey team, I've woken up with a migraine so will also take the day off to avoid screens. <span class="mention">@U01S73A9HCH</span> would it be possible to reschedule the AI hangout?</li></ul></div>
         </div>
         <div class="section section-work">
             <div class="section-header">
                 <span class="icon">📋</span>
-                <span class="label">📋 Syncio — Professional</span>
+                <span class="label">Syncio — Professional</span>
             </div>
-            <div class="content"><div class="work-tag open">STILL OPEN</div><div class="work-items">• (details in the linked notes)
-• - <strong>ENG-5008:</strong> merge order 74 → 99 → 100 → 101 → 91 → 92; DB row gate cleared 18 Sep (eng-5008-next-steps). Release branch + retargeting #74 owned by someone else. Post-audit leftovers (fragment keys, `StoresFilter`, ConfirmDialog defaults, lottie flake) are in that note.
-• - ENG-5044: pushed, PR not opened; lint rule numbering collides with ENG-5008's (eng-5044-payout-overlay).
-• - Uncarded bugs in main: Woo `user_modules` (highest value, project_woo_plan_modules_bug); `POST /api/user/installation-completed` has NO auth middleware; `getConfigs` autofill '0' store rows shadow user-level '1' via `Store::hasConfig`; 403 silent logout; IDOR-shaped BE routes; unregistered StoreObserver; payouts date-range ref type.
-• - `docs/es-localisation-findings.md` untracked in syncio-fe, parked.
-• - Parked/awaiting others: Dependabot cadence, docs/design-requests vs Jira, store-actions convention, localisation proposition replies, apoorva-site insurance.</div></div>
+            <div class="content"><div class="work-tag done">Fri 18 Sep</div><ul class="work-list"><li>Switched default model to Fable 5.1 (same weekly bucket as Opus on Max; no quota relief, just slower burn).</li><li>Context reconstructed and this note rewritten.</li><li><strong>Apoorva confirmed the <code>interface_locale</code> row is in every DB</strong> — the deploy gate for #74 is cleared.</li></ul><div class="work-tag open">STILL OPEN</div><ul class="work-list"><li><strong>ENG-5008:</strong> merge order 74 → 99 → 100 → 101 → 91 → 92; DB row gate cleared 18 Sep (eng-5008-next-steps). Release branch + retargeting #74 owned by someone else. Post-audit leftovers (fragment keys, <code>StoresFilter</code>, ConfirmDialog defaults, lottie flake) are in that note.</li><li>ENG-5044: pushed, PR not opened; lint rule numbering collides with ENG-5008's (eng-5044-payout-overlay).</li><li>Uncarded bugs in main: Woo <code>user_modules</code> (highest value, project_woo_plan_modules_bug); <code>POST /api/user/installation-completed</code> has NO auth middleware; <code>getConfigs</code> autofill '0' store rows shadow user-level '1' via <code>Store::hasConfig</code>; 403 silent logout; IDOR-shaped BE routes; unregistered StoreObserver; payouts date-range ref type.</li><li><code>docs/es-localisation-findings.md</code> untracked in syncio-fe, parked.</li><li>Parked/awaiting others: Dependabot cadence, docs/design-requests vs Jira, store-actions convention, localisation proposition replies, apoorva-site insurance.</li></ul></div>
         </div>
         <div class="section section-work">
             <div class="section-header">
                 <span class="icon">📋</span>
-                <span class="label">📋 Direct Cranes — Personal</span>
+                <span class="label">Direct Cranes — Personal</span>
             </div>
-            <div class="content"><div class="work-tag open">DIRECT CRANES — STILL OPEN</div><div class="work-items">• - <strong>Direct Cranes — clock/location round, stopped 15 Sep, never resumed:</strong> scope agreed (docket double-tap guard + clocked-on state + confirm-before-clock-off + "Clocked off at HH:mm — X h Y min"; relabel "±35 m" → "GPS accurate to 35 m"; planner "View on map" Google Maps link, capture-not-verify). Partial diffs in `~/direct-cranes-wip/2026-09-15-{docket,planner}-clock-UNFINISHED.patch` (base docket `00481db`, planner `8a18ed7`). Ask Apoorva: restart from patches or fresh; push once review clean. Standing rule: every push → deploy test → check → deploy prod (direct-cranes-deploy-on-push).
-• - Direct Cranes open from 18 Sep: inline crew add/remove per resource in the job drawer (planner `1c2867e`, live) after Apoorva clarified 'crew edit in job = add/remove crew on the job, not the crew DB' — the original '4 crew cannot edit' report was never seen in a browser (extension disconnected), form toggling proved fine in a throwaway test; CHECKLIST RULING 21 Sep: Apoorva scraps the milestone-1 Sachin checklist (~/Desktop/direct-cranes-milestone-1-sachin-checklist.md) and will give Sachin ONE checklist covering all three milestones — draft it when asked, don't chase milestone 1 alone. SUBMISSION LIVE: docket `40fa0fa` (Sign off docket when all steps done → confirm → PDF built on phone → R2 `docket_pdf` → submit with pdf_key; needs client signature where job type requires; Download serves saved PDF) + planner `35c3b78` (Download + Email docket in SignedDocket, Download on invoicing rows, `customer_contact_email` on jobs). Untested on a phone; big-photo dockets may hit Safari memory on PDF build — surfaces as 'PDF did not upload'. Planner quote scope now COMPLETE. CIVIL FLOW LIVE docket `8b4f8a6`: steps/gates/screens/PDF follow job_types flags (requires_crane_condition, requires_prestart_checklist, max_photos, signature_mode); civil = 5 checkpoints + capped Photos + Notes log + optional signatures; fixed civil PDFs printing an empty checklist. FINAL DOCKET ROUND LIVE `5edb004` (+ `99e0b57` receipt scan): press-time checkpoints (server keeps the press time when plausible), docket read-only after sign-off (fieldset lock), personal entries + unsent queue persisted in IndexedDB per account and replayed on sign-in ('N unsent — Retry' chip), receipt scan via Workers AI `@cf/meta/llama-3.2-11b-vision-instruct` (AI binding prod+preview; ~40 neurons/scan, 10k/day free; Meta licence ACCEPTED 21 Sep ~15:05 via REST `prompt: agree` using the wrangler OAuth token. FIRST PHONE SCAN FAILED 'could not read': the vision model read the receipt perfectly but in PROSE, no JSON (response_format is ignored by the vision model). FIXED over four rounds, WORKING ON THE PHONE ~16:20 (Apoorva: 'beautiful works'): docket `748e669`→`d1e5c75`→`740dec3`→`847a8b0` — vision describes in prose, `@cf/meta/llama-3.3-70b-instruct-fp8-fast` writes the JSON under a response_format json_schema (~13 neurons; llama-3.1-8b is DEPRECATED through the binding though REST still answers it); under a schema the binding returns `response` as an already-parsed OBJECT, not a string. Model reads receipt YEAR wrong (2020 for 2026) — watch. Then `d388f54` LIVE: full-page 'Reading receipt…' cover (portal, ConfirmDialog styling) while a scan runs, and the receipt button no longer forces the camera (iPhone offers Take Photo / Photo Library). Other photo inputs (CraneCheck, SiteLog, WorkPhotos) still force the camera — offered, not asked for. Then `3ea9830` LIVE: successful read hint is GREEN with a tick ('✓ Receipt read at N% confidence — check the amount before saving.'), unreadable stays amber. Docket now 335 tests, tip `3ea9830`. LESSON: `tsc --noEmit` passed while `npm run build` (tsc -b) failed on the functions folder — run the BUILD as the gate before deploy. Logs: `wrangler pages deployment tail <FULL deployment uuid> --project-name direct-cranes-docket --environment preview|production --format json` (short ids and no id both fail); events are pretty-printed multi-line JSON). Docket quote scope now COMPLETE except the live-site test. Nothing tested on a real phone today. DOCKET EASY ROUND LIVE (planner `55c74b6` + docket `ede1a20`, 0022 migrated test+prod): docket GET restricted to own jobs; sign-out reset REVERTED same day (Apoorva: 'sign out should not remove anything, we do not share phones') — sign-out keeps all local data, no prompt; clock on/off states + confirm; GPS accuracy wording + View on map (planner feed + Clock records); shared docket ConfirmDialog (clock off, sign-out, leave withdraw, passkey remove); checklist hirer signature + rectified note now upload (0022 columns on dockets). NOT built: docket sign-off confirm (no sign-off action exists yet — submission is the next big item). Docket outstanding per quote: submission + central PDF + Download both apps + planner Email docket; civil flow; receipt OCR; sign-in timing (press time). docket `1659b4e` LIVE: the 'did not save' crash was a crane photo on a job with NO specific crane unit (client sent plant_id '' → FK failure → 500); server now stores NULL and replaces retakes by hand; CraneCheck shows 'Only N of 4 sides saved…' under the grid (Apoorva: message at the spot). PASSKEYS LIVE 21 Sep: planner `4535217` (0021 passkeys tables, session rule widened, Reset passkeys on Crew) + docket `e1616ef` (@simplewebauthn 14, Face ID primary, password+code fallback, offer-once screen) deployed test+prod, 0021 migrated both; UNTESTED on a real phone. Also live: planner `12fc020` docket photos in the job feed; docket `dd5fcd5` DB refusals now reach the phone as their own 409 message (the generic 'did not save' = server crash; Apoorva's own theory: the four-sides crane photo gate — that gate refuses client-side with its own text, so not the cause). PLANNER OUTSTANDING ROUND (21 Sep, Apoorva: 'complete planner outstanding tasks, do not use up tokens'): `bc63e9e` LIVE — compliance docs + signed-docket attach now persist (upload → job_documents via /api/documents, files open via /api/files), calendar drag/resize confirms. DONE `db33224` (planner) + `082e84a` (docket): confirm prompts on Statuses edit/switch, Crew login resets, Leave decisions, Invoicing moves; `Cache-Control: no-store` on all JSON (Apoorva: planner Refresh only fetched on page reload — browser was caching GETs); handover 0018 line fixed. Planner quote items now all built except milestone-1 acceptance run (Apoorva's). Passkey build (docket primary Face ID, variation) running in a dev agent — migration 0021, deploys pending. Deploy trick while an agent holds uncommitted edits: detached `git worktree add --detach <sha>` + symlink node_modules, deploy from there; docket job link in assignment emails + `?job=` deep link (planner `e00264a`, docket `f7a232e`); docket `cbbd72e` adds manifest.webmanifest + icons + apple-mobile-web-app meta (standalone) because Apoorva reported 'the job link does not open the PWA' — Android now captures links into the installed app; iPhone Mail links ALWAYS open Safari (Apple limit) and the standalone home-screen app has its own cookie jar, so crew sign in inside it; authenticator key Copy button + Microsoft/Google steps on both sign-in screens (planner `269ca2a`, docket `daa5c98`, Mon 21 Sep); bulk BCC send LIVE (planner `0e5c4fb`, Mon 21 Sep); address lookup LIVE on Geoapify (planner `5a78c1f`, Mon 21 Sep): Google was abandoned — Cloud console demanded a $40 prepayment and Apoorva could not create the account; `GEOAPIFY_KEY` secret is SET on prod + preview, lookup untested in a browser yet (browser extension disconnected all of 18 Sep, nothing eyeballed in the UI).
-• - Direct Cranes other open: mailto buttons open nothing on Apoorva's Mac (no mail account — not a bug); two 3-second junk clock shifts in test DB (immutable); Cloudflare-sent email is a variation to quote if wanted.
-• - Direct Cranes milestone 1: Apoorva adds a crew email + Create login in prod, runs `~/Desktop/direct-cranes-milestone-1-sachin-checklist.md`, sends with the $1,500 invoice (not conditional on his test). Prod: 1 login (it@), 0 docket logins. Week-3 variations (calendar) + owed confirmation prompts in handover.</div></div>
+            <div class="content"><div class="work-tag progress">DIRECT CRANES — LATEST</div><div class="work-items"><strong>21 Sep 2026 late — push notifications + admins + bell + link LIVE.</strong> Planner <code>1b289ca</code> (592 tests) / docket <code>445c54e</code> (343): docket PUSH (0026, <code>webPush.ts</code>, VAPID secrets differ prod/preview, untested on a phone); ADMINS (0025: apoorva yahoo + sachin; only admins delete/make admins); public docket-PDF link (0023); Other role/licence (0024); bell reads <code>/api/notifications</code> (pending leave + a day of clock); receipt scan two-model and WORKING on a phone; Clock screen split + Earlier list;…</div><div class="work-tag open">DIRECT CRANES — STILL OPEN</div><ul class="work-list"><li><strong>Direct Cranes — open after 21 Sep:</strong> phone-test push notifications, passkeys, sign-off PDF upload, IDB persistence; confirm Leave date fields fit; confirm Geoapify suggestions ever appear (else test the key directly); combined 3-milestone checklist for Sachin (not written); handover refresh is current to 21 Sep evening; prod crew still have no emails; the 15 Sep clock patches in ~/direct-cranes-wip are superseded — delete; 4 stale scratch worktrees to prune; receipt model reads the year wrong; variations to bill: passkeys, receipt scan, public link, admins, push.</li><li>Direct Cranes other open: mailto buttons open nothing on Apoorva's Mac (no mail account — not a bug); two 3-second junk clock shifts in test DB (immutable); Cloudflare-sent email is a variation to quote if wanted.</li><li>Direct Cranes milestone 1: Apoorva adds a crew email + Create login in prod, runs <code>~/Desktop/direct-cranes-milestone-1-sachin-checklist.md</code>, sends with the $1,500 invoice (not conditional on his test). Prod: 1 login (it@), 0 docket logins. Week-3 variations (calendar) + owed confirmation prompts in handover.</li></ul></div>
         </div>
   </div>
-  <div class="footer">Generated by Hermes · 15:38</div>
+  <div class="footer">Generated by Hermes · 17:06</div>
 </div>
 <script>
 (function() {
