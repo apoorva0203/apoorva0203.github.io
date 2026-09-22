@@ -52,6 +52,7 @@
   .work-tag.done { background: #dcfce7; color: #166534; }
   .work-tag.open { background: #fee2e2; color: #991b1b; }
   .work-tag.progress { background: #fef9c3; color: #854d0e; }
+  .work-tag.mention { background: #fef3c7; color: #b45309; border: 1px dashed #f59e0b; }
   .work-items { white-space: normal; font-size: 13px; line-height: 1.55; color: #44403c; margin: 0 0 12px; }
   .work-items:last-child { margin-bottom: 0; }
   .footer { text-align: center; padding: 10px 22px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #f8fafc; }
@@ -91,35 +92,46 @@
                 <span class="icon">📅</span>
                 <span class="label">Calendar</span>
             </div>
-            <div class="content"><p class="empty">No answer from Calendar (timed out)</p></div>
+            <div class="content"><p class="empty">No calendar events today</p></div>
         </div>
         <div class="section section-rem">
             <div class="section-header">
                 <span class="icon">✅</span>
                 <span class="label">Reminders</span>
             </div>
-            <div class="content">Reminders: Command '['remindctl', 'today']' timed out after 10 seconds</div>
+            <div class="content"><p class="empty">No reminders due today</p></div>
         </div>
         <div class="section section-email">
             <div class="section-header">
                 <span class="icon">📧</span>
                 <span class="label">Email</span>
             </div>
-            <div class="content">Email: command: FETCH =&gt; socket error: EOF</div>
+            <div class="content">• FREE school holiday fun is happening at Ormiston 👀 — Ormiston Town Centre
+• 50% off Coles beauty &amp; care 🧴🫧 — Uber Eats
+• The Lizzie Borden Story gets the glossy, gory Ryan Murphy treatment — Flicks
+• Apoorva, use your promo — Tui from Bolt
+• How to Live on Earth - a visionary feature documentary available to watch on YouTube now ; Great Jobs. Great People. — The Creative Store. Great Jobs. Great People.</div>
         </div>
         <div class="section section-gh">
             <div class="section-header">
                 <span class="icon">🔗</span>
                 <span class="label">GitHub PRs</span>
             </div>
-            <div class="content"><div class="work-tag progress">Open PRs with pending review</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/101" target="_blank" rel="noopener">#101 ENG-5008: wrap payouts, products and dashboard copy, and land the translations (4/10)</a> — 💬 Reviewed by: nainesh-syncio (4 commits, +6594/-1153)</li><li><a href="https://github.com/syncio/syncio-fe/pull/100" target="_blank" rel="noopener">#100 ENG-5008: wrap registration, settings and catalogue copy (3/10)</a> — 👀 Review: jaiwalker, softfish (2 commits, +1533/-1177)</li><li><a href="https://github.com/syncio/syncio-fe/pull/99" target="_blank" rel="noopener">#99 ENG-5008: wrap shared component and marketplace copy (2/10)</a> — 💬 Reviewed by: apoorva0203, nainesh-syncio (10 commits, +1867/-799)</li><li><a href="https://github.com/syncio/syncio-fe/pull/92" target="_blank" rel="noopener">#92 ENG-5008: catch bare copy inside template expressions (6/10)</a> — 💬 Reviewed by: nainesh-syncio (15 commits, +676/-110)</li><li><a href="https://github.com/syncio/syncio-fe/pull/91" target="_blank" rel="noopener">#91 ENG-5008: localise dates, Spanish review fixes and the language record (5/10)</a> — 👀 Review: softfish (7 commits, +2523/-1333)</li><li><a href="https://github.com/syncio/syncio-fe/pull/90" target="_blank" rel="noopener">#90 [ENG-5054] cancel stale InventoryCounter fetches on Source Store switch</a> — 💬 Reviewed by: nainesh-syncio, apoorva0203, jaiwalker (4 commits, +14/-4)</li><li><a href="https://github.com/syncio/syncio-fe/pull/88" target="_blank" rel="noopener">#88 Feature/eng 5044 payout setup dialog crash</a> (3 commits, +441/-61)</li><li><a href="https://github.com/syncio/syncio-fe/pull/74" target="_blank" rel="noopener">#74 ENG-5008: localisation slot and language settings (1/10)</a> — 👀 Review: softfish (29 commits, +2126/-14)</li></ul></div>
+            <div class="content"><div class="work-tag progress">Open PRs</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/90" target="_blank" rel="noopener">#90 [ENG-5054] cancel stale InventoryCounter fetches on Source Store switch</a> — 💬 Reviewed by: nainesh-syncio, apoorva0203, jaiwalker (4 commits, +14/-4)</li><li><a href="https://github.com/syncio/syncio-fe/pull/88" target="_blank" rel="noopener">#88 Feature/eng 5044 payout setup dialog crash</a> (3 commits, +441/-61)</li></ul></div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub Mentions</span>
+            </div>
+            <div class="content">GitHub mentions: name 'GITHUB_USER_LOGIN' is not defined</div>
         </div>
         <div class="section section-slack">
             <div class="section-header">
                 <span class="icon">💬</span>
                 <span class="label">Slack</span>
             </div>
-            <div class="content"><div class="work-tag progress">79 channels · last 24h</div><ul class="work-list"><li><strong>#design_system_2026</strong> <span class="mention">@U08JGPPJBFS</span> <span class="mention">@U0A7ECQFF7C</span> I just realised.. the Payouts settings page isn't it's own page, but it opens up as a full-width drawer, just over the current page the user is on. Is this correct?</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> - <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#88] …</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-fe</strong> - <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#74] …</li><li><strong>#growth_projects</strong> <strong>A/B TEST RESULTS + LEARNINGS</strong> <strong>Winning combination</strong> • (1) Feature-oriented CTA subjectline. Winning ver → <a href="https://us18.campaign-archive.com/?u=d3876b95496c25d2e8d7568bb&id=c588b102e1" target="_blank" rel="noopener">here</a> • (2) hea…</li><li><strong>#growth_projects</strong> <strong>W3 CHECKPOINT - SHOPIFY ADS</strong> No results from all experiment campaigns. Noteworthy changes: • [CAT} Bulk editor: all-time CPI increases from $16 to $22. Still under benchmark (CAT Inventory Sync $24.0…</li><li><strong>#infra-upgrade</strong> @Apoorv Singh created an update</li><li><strong>#infra-upgrade</strong> @Apoorv Singh created an update</li><li><strong>#pm_general</strong> Just noticed a broken link on this page (viewing a payout setting as SS). Links to here: <a href="https://help.syncio.co/en/articles/7325099-payouts-101" target="_blank" rel="noopener">help.syncio.co/en/articles/7325099-payouts-101</a> Any clu…</li><li><strong>#pm_market</strong> Appstore fun and games… <a href="https://lnkd.in/p/gJ4knV2H" target="_blank" rel="noopener">https://lnkd.in/p/gJ4knV2H</a></li><li><strong>#proj-analytics</strong> hey <span class="mention">@here</span> how have we been calculating &amp; reporting on Revenue every month? Is there a report to download anywhere, or perhaps a formula to calculate from a certain source?</li><li><strong>#proj-analytics</strong> hey <span class="mention">@here</span> upon going through data for Plans & Upgrades i saw a lot (around 100ish) of our SS users are at "Essential" plan. I don't see this at both DS or SS pricing page. Can someone fill me in on …</li><li><strong>#team_general</strong> <span class="mention">@here</span> I have moved the AI Hangout to Tuesday same time. Apologies.</li></ul></div>
+            <div class="content"><div class="work-tag progress">79 channels · last 24h</div><ul class="work-list"><li><strong>#cs_ticket_discussions</strong> <span class="mention">@U0A7ECQFF7C</span>, got a rare FE support case. It's related to catalogs. Do you have time today to check this out:? …</li><li><strong>#eng_general</strong> <span class="mention">@U0A7ECQFF7C</span> I have review and approved the PR - there 2 minor things to think about - you can make a call on this. I think I have approved the stack</li><li><strong>#eng_general</strong> <span class="mention">@subteam^S01V93F5EMR</span> I have merged release 8.0.1 back into master -&gt; please pull</li><li><strong>#farewell_zara</strong> <span class="mention">@U02DSB27W2Z</span> has left the channel</li><li><strong>#growth_general</strong> hey <span class="mention">@U06NCS0HACF</span> quick question, what does Coco refer to in the Monthly user report? Is it Mailchimp coco newsletter sub ID or Marketplace profile ID?</li><li><strong>#growth_general</strong> hey sorry another question <span class="mention">@here</span>, there's a huge increase in Marketplace profile no. from Jan to Mar this year (we're talking 2 digits %MoM, while from Apr it's down to 1.3-1.5% MoM). I'm wondering …</li><li><strong>#growth_projects</strong> <strong>W3 CHECKPOINT - SHOPIFY ADS</strong> No results from all experiment campaigns. Noteworthy changes: • [CAT} Bulk editor: all-time CPI increases from $16 to $22. Still under benchmark (CAT Inventory Sync $24.0…</li><li><strong>#infra-upgrade</strong> @Apoorv Singh created an update</li><li><strong>#infra-upgrade</strong> @Apoorv Singh created an update</li><li><strong>#pm_general</strong> Hey <span class="mention">@U08JGPPJBFS</span> <span class="mention">@U02DSB27W2Z</span> <span class="mention">@U0BNZ1ZNYQ0</span> here’s today’s PM catch up agenda - please add to it if you’d like: …</li><li><strong>#pm_general</strong> Just noticed a broken link on this page (viewing a payout setting as SS). Links to here: <a href="https://help.syncio.co/en/articles/7325099-payouts-101" target="_blank" rel="noopener">help.syncio.co/en/articles/7325099-payouts-101</a> Any clu…</li><li><strong>#pm_market</strong> Appstore fun and games… <a href="https://lnkd.in/p/gJ4knV2H" target="_blank" rel="noopener">https://lnkd.in/p/gJ4knV2H</a></li></ul></div>
         </div>
         <div class="section section-work">
             <div class="section-header">
@@ -136,7 +148,7 @@
             <div class="content"><div class="work-tag progress">DIRECT CRANES — LATEST</div><div class="work-items"><strong>21 Sep 2026 late — push notifications + admins + bell + link LIVE.</strong> Planner <code>1b289ca</code> (592 tests) / docket <code>445c54e</code> (343): docket PUSH (0026, <code>webPush.ts</code>, VAPID secrets differ prod/preview, untested on a phone); ADMINS (0025: apoorva yahoo + sachin; only admins delete/make admins); public docket-PDF link (0023); Other role/licence (0024); bell reads <code>/api/notifications</code> (pending leave + a day of clock); receipt scan two-model and WORKING on a phone; Clock screen split + Earlier list;…</div><div class="work-tag open">DIRECT CRANES — STILL OPEN</div><ul class="work-list"><li><strong>Direct Cranes — open after 21 Sep:</strong> phone-test push notifications, passkeys, sign-off PDF upload, IDB persistence; confirm Leave date fields fit; confirm Geoapify suggestions ever appear (else test the key directly); combined 3-milestone checklist for Sachin (not written); handover refresh is current to 21 Sep evening; prod crew still have no emails; the 15 Sep clock patches in ~/direct-cranes-wip are superseded — delete; 4 stale scratch worktrees to prune; receipt model reads the year wrong; variations to bill: passkeys, receipt scan, public link, admins, push.</li><li>Direct Cranes other open: mailto buttons open nothing on Apoorva's Mac (no mail account — not a bug); two 3-second junk clock shifts in test DB (immutable); Cloudflare-sent email is a variation to quote if wanted.</li><li>Direct Cranes milestone 1: Apoorva adds a crew email + Create login in prod, runs <code>~/Desktop/direct-cranes-milestone-1-sachin-checklist.md</code>, sends with the $1,500 invoice (not conditional on his test). Prod: 1 login (it@), 0 docket logins. Week-3 variations (calendar) + owed confirmation prompts in handover.</li></ul></div>
         </div>
   </div>
-  <div class="footer">Generated by Hermes · 08:50</div>
+  <div class="footer">Generated by Hermes · 11:00</div>
 </div>
 <script>
 (function() {
