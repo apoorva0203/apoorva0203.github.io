@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☀️ Morning Summary</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%); color: #1a1a2e; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 600px; margin: 0 auto 20px; background: #ffffff; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 24px 28px; position: relative; overflow: hidden; }
+  .header::after { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+  .header::before { content: ''; position: absolute; bottom: -30px; left: 20%; width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+  .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .header .date { font-size: 13px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
+  .body { padding: 16px 16px 20px; }
+  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; margin: 0 0 14px 0; min-width: 0; }
+  .section:last-child { margin-bottom: 0; }
+
+  /* Desktop: two columns, work sections full width on top */
+  @media (min-width: 768px) {
+    body { padding: 24px; }
+    .page { max-width: 1100px; }
+    .body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 24px 24px; align-items: start; }
+    .section { margin: 0; }
+    .section-work, .section-gh, .section-slack { grid-column: 1 / -1; }
+    .section-work { order: -1; }
+    .header { padding: 28px 32px; }
+    .header h1 { font-size: 26px; }
+    .footer { padding: 12px 24px; }
+  }
+  .section-cal { border-left: 4px solid #3b82f6; }
+  .section-rem { border-left: 4px solid #10b981; }
+  .section-email { border-left: 4px solid #f59e0b; }
+  .section-slack { border-left: 4px solid #8b5cf6; }
+  .section-work { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-color: #fcd34d; }
+  .section-gh { border-left: 4px solid #ef4444; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+  .section-header .icon { font-size: 16px; }
+  .section-header .label { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: #475569; }
+  .content { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #334155; }
+  .content ul { white-space: normal; margin: 0 0 12px; padding-left: 18px; }
+  .content ul:last-child { margin-bottom: 0; }
+  .content li { margin: 0 0 6px; }
+  .content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: rgba(15,23,42,0.06); padding: 1px 5px; border-radius: 4px; }
+  .work-list { font-size: 13px; line-height: 1.55; color: #44403c; }
+  .content a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+  .content a:hover { text-decoration: underline; }
+  .content .mention { color: #8b5cf6; font-weight: 500; }
+  .empty { color: #94a3b8; font-style: italic; font-size: 13px; text-align: center; padding: 8px 0; }
+  .work-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .work-tag.done { background: #dcfce7; color: #166534; }
+  .work-tag.open { background: #fee2e2; color: #991b1b; }
+  .work-tag.progress { background: #fef9c3; color: #854d0e; }
+  .work-tag.mention { background: #fef3c7; color: #b45309; border: 1px dashed #f59e0b; }
+  .work-items { white-space: normal; font-size: 13px; line-height: 1.55; color: #44403c; margin: 0 0 12px; }
+  .work-items:last-child { margin-bottom: 0; }
+  .footer { text-align: center; padding: 10px 22px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+  .pwd-gate { position: fixed; inset: 0; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .pwd-gate .box { background: #ffffff; border-radius: 16px; padding: 36px 32px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 300px; width: 90%; }
+  .pwd-gate h2 { margin: 0 0 4px; font-size: 20px; color: #1a1a2e; font-weight: 700; }
+  .pwd-gate .lock-icon { font-size: 40px; margin-bottom: 8px; display: block; }
+  .pwd-gate p { font-size: 13px; color: #64748b; margin: 0 0 24px; }
+  .pwd-gate input { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; box-sizing: border-box; margin-bottom: 14px; transition: border-color 0.15s; }
+  .pwd-gate input:focus { outline: none; border-color: #4f46e5; }
+  .pwd-gate button { width: 100%; padding: 11px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .pwd-gate button:hover { background: #4338ca; }
+  .pwd-gate .error { color: #ef4444; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 500; }
+  .page { display: none; }
+</style>
+</head>
+<body>
+<div class="pwd-gate" id="pwdGate">
+  <div class="box">
+    <span class="lock-icon">🔒</span>
+    <h2>Locked</h2>
+    <p>Enter your morning summary password</p>
+    <input type="password" id="pwdInput" placeholder="Password" autocomplete="off">
+    <button id="pwdBtn">Unlock</button>
+    <div class="error" id="pwdError"></div>
+  </div>
+</div>
+<div class="page" id="summaryPage">
+  <div class="header">
+    <h1>☀️ Morning Summary</h1>
+    <div class="date">Friday, September 25</div>
+  </div>
+  <div class="body">
+    
+        <div class="section section-cal">
+            <div class="section-header">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </div>
+            <div class="content"><p class="empty">No answer from Calendar (timed out)</p></div>
+        </div>
+        <div class="section section-rem">
+            <div class="section-header">
+                <span class="icon">✅</span>
+                <span class="label">Reminders</span>
+            </div>
+            <div class="content"><p class="empty">No reminders due today</p></div>
+        </div>
+        <div class="section section-email">
+            <div class="section-header">
+                <span class="icon">📧</span>
+                <span class="label">Email</span>
+            </div>
+            <div class="content">• New updates from homes.co.nz — homes
+• Varun, Step Into Comfort With $20 On Us — Skechers
+• ✨Something New is Here for Premium — Lose It!
+• Don't miss out! Get your Youfoodz meals sorted by 11:59 PM tonight 🏃 — Youfoodz
+• You’re in, Apoorva 🙌 Let’s get your meals sorted. — Youfoodz</div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub PRs</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Open PRs</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/90" target="_blank" rel="noopener">#90 [ENG-5054] cancel stale InventoryCounter fetches on Source Store switch</a> — 💬 Reviewed by: nainesh-syncio, apoorva0203, jaiwalker (4 commits, +14/-4)</li><li><a href="https://github.com/syncio/syncio-fe/pull/88" target="_blank" rel="noopener">#88 Feature/eng 5044 payout setup dialog crash</a> (3 commits, +441/-61)</li></ul></div>
+        </div>
+        <div class="section section-slack">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">Slack</span>
+            </div>
+            <div class="content"><div class="work-tag progress">79 channels · last 24h</div><ul class="work-list"><li><strong>#cs_ticket_discussions</strong> <span class="mention">@U04GB8L148M</span> Found a potential order edit bug on staging: <a href="https://syncio.atlassian.net/browse/ESC-2194" target="_blank" rel="noopener">[BUG?] 24/09/2026 - STAGING - Order Edit - Add New Product Fails</a> • Broken path - Order edit, …</li><li><strong>#eng_general</strong> <span class="mention">@subteam^S01V93F5EMR</span> there was slight issue with PR review not working , I just fixed it. So please rerun any Failed github actions</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> - <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#88] …</li><li><strong>#team_general</strong> Hey Team, I will take Oct 2nd (next Friday) off as a Wellness day as I have to get some Iron infusion</li><li><strong>#team_general</strong> Hey team, Myra has a bit of a temperature, taking her to the doc at 11 before we hit the Grand Final holiday. I will be off for couple of hr from 11 -12</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Syncio — Professional</span>
+            </div>
+            <div class="content"><div class="work-tag done">Thu 24 Sep</div><ul class="work-list"><li>Sachin's first feedback list (7 items) assessed, then built as ONE planner round, live on test all day while Apoorva steered the look: planner <code>e9d3ccd</code> (then <code>aacfeba</code> handover), 0027 on test + prod, deployed test then prod. Docket <code>07cf124</code> followed with 12-hour times, reviewed clean, live test + prod. Reviewer pass (nits only) → nits fixed → commit → push → deploy. Details in project-direct-cranes-state and handover "Sachin's first feedback round (24 Sep)".</li><li>Apoorva's design calls today (don't re-litigate): jobs STACK vertically per day (no hour axis in week/day), one tinted card per job, hierarchy by weight/size only, 12-hour am/pm ("Australia uses 12 hr"), no dots on cards or key, solid status icons in the status colour (clock stays outline), day headers dark with light text, softer edges, completed cards keep their colour with an invoice BADGE (Unverified/Verified style from a reference image: orange burst / indigo tick / green plane), Pending pure deep red on prod.</li><li>Invoicing model kept as is (not ready / ready / sent, one step either way, Not ready = the hold state); a pasted "Ready should be derived + Hold state" proposal was argued down.</li><li>Ten MOCK jobs inserted on test for the calendar preview, deleted before release.</li></ul><div class="work-tag open">STILL OPEN</div><ul class="work-list"><li><strong>Syncio:</strong> syncio-be PR #107 review not done. ENG-5008 merge order 74 → 99 → 100 → 101 → 91 → 92 (eng-5008-next-steps); ENG-5044 pushed, no PR.</li><li>Uncarded bugs in main and parked items: unchanged from 21 Sep, see project-direct-cranes-state and the syncio notes.</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Direct Cranes — Personal</span>
+            </div>
+            <div class="content"><div class="work-tag progress">DIRECT CRANES — LATEST</div><div class="work-items"><strong>24 Sep 2026 — Sachin's first feedback round LIVE on test + prod.</strong> Planner <code>e9d3ccd</code> (614 tests), migration 0027 applied to both DBs (Pending → <code>#e00000</code> on prod; test keeps the <code>#fc0307</code> Sachin set by hand). Docket <code>07cf124</code> (343 tests) later the same day: every displayed time and the PDF moved to 12-hour am/pm too, reviewed clean, live test + prod. Planner tip <code>aacfeba</code> (handover line). Built after a long live-on-test iteration with Apoorva: week/day views are FullCalendar DAY GRIDS (jobs…</div><div class="work-tag open">DIRECT CRANES — STILL OPEN</div><ul class="work-list"><li><strong>Direct Cranes:</strong> the PO field is "Purchase order" in planner and "Order number" in docket + PDF — Apoorva has not chosen a label. Reply email to Sachin drafted in chat (24 Sep), not sent. Milestone 1 + 2 invoices to send. Phone-test push, passkeys, sign-off PDF upload, IDB; Geoapify suggestions unconfirmed; combined 3-milestone checklist not written; prod crew have no emails; variations to bill (passkeys, receipt scan, public link, admins, push); stale <code>~/direct-cranes-wip</code> patches + 4 scratch worktrees to prune.</li></ul></div>
+        </div>
+  </div>
+  <div class="footer">Generated by Hermes · 09:24</div>
+</div>
+<script>
+(function() {
+    var gate = document.getElementById('pwdGate');
+    var page = document.getElementById('summaryPage');
+    var input = document.getElementById('pwdInput');
+    var btn = document.getElementById('pwdBtn');
+    var error = document.getElementById('pwdError');
+    var PASSWORD = 'hermes';
+
+    function tryUnlock() {
+        var val = input.value;
+        if (val === PASSWORD) {
+            gate.style.display = 'none';
+            page.style.display = 'block';
+        } else {
+            error.textContent = 'Wrong password';
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') tryUnlock();
+    });
+    input.focus();
+})();
+</script>
+</body>
+</html>
