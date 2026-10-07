@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☀️ Morning Summary</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%); color: #1a1a2e; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 600px; margin: 0 auto 20px; background: #ffffff; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 24px 28px; position: relative; overflow: hidden; }
+  .header::after { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+  .header::before { content: ''; position: absolute; bottom: -30px; left: 20%; width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+  .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .header .date { font-size: 13px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
+  .body { padding: 16px 16px 20px; }
+  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; margin: 0 0 14px 0; min-width: 0; }
+  .section:last-child { margin-bottom: 0; }
+
+  /* Desktop: two columns, work sections full width on top */
+  @media (min-width: 768px) {
+    body { padding: 24px; }
+    .page { max-width: 1100px; }
+    .body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 24px 24px; align-items: start; }
+    .section { margin: 0; }
+    .section-work, .section-gh, .section-slack { grid-column: 1 / -1; }
+    .section-work { order: -1; }
+    .header { padding: 28px 32px; }
+    .header h1 { font-size: 26px; }
+    .footer { padding: 12px 24px; }
+  }
+  .section-cal { border-left: 4px solid #3b82f6; }
+  .section-rem { border-left: 4px solid #10b981; }
+  .section-email { border-left: 4px solid #f59e0b; }
+  .section-slack { border-left: 4px solid #8b5cf6; }
+  .section-work { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-color: #fcd34d; }
+  .section-gh { border-left: 4px solid #ef4444; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+  .section-header .icon { font-size: 16px; }
+  .section-header .label { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: #475569; }
+  .content { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #334155; }
+  .content ul { white-space: normal; margin: 0 0 12px; padding-left: 18px; }
+  .content ul:last-child { margin-bottom: 0; }
+  .content li { margin: 0 0 6px; }
+  .content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: rgba(15,23,42,0.06); padding: 1px 5px; border-radius: 4px; }
+  .work-list { font-size: 13px; line-height: 1.55; color: #44403c; }
+  .content a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+  .content a:hover { text-decoration: underline; }
+  .content .mention { color: #8b5cf6; font-weight: 500; }
+  .empty { color: #94a3b8; font-style: italic; font-size: 13px; text-align: center; padding: 8px 0; }
+  .work-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .work-tag.done { background: #dcfce7; color: #166534; }
+  .work-tag.open { background: #fee2e2; color: #991b1b; }
+  .work-tag.progress { background: #fef9c3; color: #854d0e; }
+  .work-tag.mention { background: #fef3c7; color: #b45309; border: 1px dashed #f59e0b; }
+  .work-items { white-space: normal; font-size: 13px; line-height: 1.55; color: #44403c; margin: 0 0 12px; }
+  .work-items:last-child { margin-bottom: 0; }
+  .footer { text-align: center; padding: 10px 22px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+  .pwd-gate { position: fixed; inset: 0; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .pwd-gate .box { background: #ffffff; border-radius: 16px; padding: 36px 32px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 300px; width: 90%; }
+  .pwd-gate h2 { margin: 0 0 4px; font-size: 20px; color: #1a1a2e; font-weight: 700; }
+  .pwd-gate .lock-icon { font-size: 40px; margin-bottom: 8px; display: block; }
+  .pwd-gate p { font-size: 13px; color: #64748b; margin: 0 0 24px; }
+  .pwd-gate input { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; box-sizing: border-box; margin-bottom: 14px; transition: border-color 0.15s; }
+  .pwd-gate input:focus { outline: none; border-color: #4f46e5; }
+  .pwd-gate button { width: 100%; padding: 11px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .pwd-gate button:hover { background: #4338ca; }
+  .pwd-gate .error { color: #ef4444; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 500; }
+  .page { display: none; }
+</style>
+</head>
+<body>
+<div class="pwd-gate" id="pwdGate">
+  <div class="box">
+    <span class="lock-icon">🔒</span>
+    <h2>Locked</h2>
+    <p>Enter your morning summary password</p>
+    <input type="password" id="pwdInput" placeholder="Password" autocomplete="off">
+    <button id="pwdBtn">Unlock</button>
+    <div class="error" id="pwdError"></div>
+  </div>
+</div>
+<div class="page" id="summaryPage">
+  <div class="header">
+    <h1>☀️ Morning Summary</h1>
+    <div class="date">Thursday, October 08</div>
+  </div>
+  <div class="body">
+    
+        <div class="section section-cal">
+            <div class="section-header">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </div>
+            <div class="content">• 10:00 am — Design system weekly catch-up — apoorva@syncio.co</div>
+        </div>
+        <div class="section section-email">
+            <div class="section-header">
+                <span class="icon">📧</span>
+                <span class="label">Email</span>
+            </div>
+            <div class="content">• $60M Powerball tonight! — Oz Lotteries
+• Your Personalized Remote Jobs for Extra Income 🚀 (Oct. 07) — Intch
+• 'Niddrie Autistic School 2026' photographs will be removed in 3 days — Wunderkind Photography
+• 'Niddrie Autistic School 2026' photographs will be removed in 3 days — Wunderkind Photography
+• From 80ml and near Mastitis to 400ml — Milkbar Maternity &amp; Breastfeeding</div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub PRs</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Open PRs with pending review</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/131" target="_blank" rel="noopener">#131 feat(ENG-4953): rebuild Product Settings on the design system</a> — 💬 Reviewed by: apoorva0203 (8 commits, +1439/-363)</li><li><a href="https://github.com/syncio/syncio-fe/pull/130" target="_blank" rel="noopener">#130 feat(ENG-5109): announce language support on the dashboard banner</a> — 👀 Review: Suharsh329 (1 commits, +80/-79)</li><li><a href="https://github.com/syncio/syncio-fe/pull/129" target="_blank" rel="noopener">#129 chore(e2e): add a Product Settings spec and a dispatchable staging run</a> (2 commits, +254/-8)</li><li><a href="https://github.com/syncio/syncio-fe/pull/128" target="_blank" rel="noopener">#128 chore(deps)(deps-dev): bump @vitest/ui from 4.1.11 to 5.0.3</a> (1 commits, +44/-17)</li><li><a href="https://github.com/syncio/syncio-fe/pull/127" target="_blank" rel="noopener">#127 chore(deps)(deps-dev): bump msw from 2.15.0 to 3.0.1</a> (1 commits, +210/-235)</li><li><a href="https://github.com/syncio/syncio-fe/pull/126" target="_blank" rel="noopener">#126 chore(deps)(deps-dev): bump @vitest/coverage-v8 from 4.1.11 to 5.0.3</a> (1 commits, +54/-118)</li><li><a href="https://github.com/syncio/syncio-fe/pull/125" target="_blank" rel="noopener">#125 chore(deps)(deps): bump the patch-and-minor group with 12 updates</a> (1 commits, +168/-168)</li><li><a href="https://github.com/syncio/syncio-fe/pull/124" target="_blank" rel="noopener">#124 chore(deps)(deps-dev): bump vitest from 4.1.11 to 5.0.3 in the vitest group</a> (1 commits, +90/-146)</li><li><a href="https://github.com/syncio/syncio-fe/pull/122" target="_blank" rel="noopener">#122 Proxy Vite /api to local Laravel in development</a> (1 commits, +9/-4)</li></ul></div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub Mentions</span>
+            </div>
+            <div class="content"><div class="work-tag mention">MENTIONS</div><ul class="work-list"><li>🔔 <a href="https://github.com/syncio/syncio-admin-fe/pull/10" target="_blank" rel="noopener">#10 [ENG-5052] Add store tracking resync workflow</a> <span style="font-size:11px;color:#94a3b8;">(mentioned)</span></li><li>🔔 <a href="https://github.com/syncio/syncio-be/pull/107" target="_blank" rel="noopener">#107 ENG-5060: Wait for adjustment history before setting push-order fulfillment location</a> <span style="font-size:11px;color:#94a3b8;">(mentioned)</span></li></ul></div>
+        </div>
+        <div class="section section-slack">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">Slack</span>
+            </div>
+            <div class="content"><div class="work-tag progress">78 channels · last 24h</div><ul class="work-list"><li><strong>#cs_ticket_discussions</strong> while I am researching and playing with the CS tools vs AI. I got this interesting products “Westport Knit Denim Weekender Sweatpant with Pockets and Drawstring Waist” I will post the finding in the t…</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-admin-fe</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#7] …</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#88] …</li><li><strong>#growth_general</strong> Our net merchant growth is back at 100(+) over last 30 days for the first in a while!</li><li><strong>#team_general</strong> Hey <span class="mention">@channel</span> please join us today for a TedxSyncio talk - we have <span class="mention">@U06A57VBC6L</span> presenting. Can’t wait!</li><li><strong>#team_general</strong> Hey Team, general reminder about my son's swim class between 2:30 -4:00pm</li><li><strong>#team_random</strong> this was my baby at his peak :pensive:</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Syncio — Professional</span>
+            </div>
+            <div class="content"><div class="work-tag done">Wed 7 Oct — Expenses tab</div><ul class="work-list"><li><strong>LIVE on test + prod.</strong> Planner <code>cd5f143</code>, docket <code>3ebb877</code>, pushed. 0029 on both DBs. I did test; Apoorva ran prod migrate + both deploys (auto mode blocked me) and said "all done". Prod smoke: both apps 200, <code>/api/expenses</code> 401 unauthenticated. Pre-migrate prod bookmark <code>00000030-00000000-000050fc-88f6a5e126d7df2dd734b5d96f308949</code>.</li><li><strong>Open:</strong> signed-in click-through (approve/reject/pay/undo) not confirmed by me; handover still says "Not released as at 7 Oct" (one-line commit owed); rejected claims counted in the All total (Apoorva's call pending).</li><li>Manage → Expenses after Leave: list all docket expenses, filters (status/person/local dates), total (includes rejected — Apoorva's call pending, left as built). Claimed → Approve/Reject (no reason); approved → Mark paid; each undoable one step. PUT {id, from, status}, 409 on stale.</li><li>Migration 0029 (planner only; docket reads planner's migrations): <code>expense_reviews</code>, <code>docket_expenses.recorded_by</code> (docket binds on INSERT), <code>expense_claimant_guesses</code> backfill = job's sole crew member, shown "(best guess)". Sign-off trigger untouched.</li><li>Tests: planner 691, docket 388. Two reviewer passes; second was nits only, both fixed. Built in scratchpad worktrees (<code>planner-expenses</code>, <code>docket-expenses</code>), now throwaway; <code>~/planner</code> and <code>~/docket</code> main fast-forwarded to the pushed commits.</li><li>Prod D1 reads, migrate and deploy were blocked by auto mode in this session; Apoorva runs them with <code>!</code>.</li></ul><div class="work-tag open">STILL OPEN</div><ul class="work-list"><li>Payment of the final invoice (14 day terms, due ~15 Oct); ownership passes on receipt.</li><li>Sachin + Stephanie accept GitHub owner invites.</li><li>Defect window to 15 Oct — handle any reports Sachin sends; after that $110/hr.</li><li>Written reference from Sachin (quotation clause 4) + permission to show the apps.</li><li>Never tried on a real phone: passkeys; unsent work surviving a closed app.</li><li>Accepted nits: useAdminStore.load no latest-request guard; docket sync-auth.mjs ignores --check; two phones on one job can strand an unsent on the second. Custom domains deferred.</li><li><strong>Syncio:</strong> see daily-context-syncio.</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Direct Cranes — Personal</span>
+            </div>
+            <div class="content"><div class="work-tag progress">DIRECT CRANES — LATEST</div><div class="work-items"><strong>7 Oct 2026 — Expenses tab LIVE on test + prod (free variation, in the defect window).</strong> Planner <code>cd5f143</code> (691 tests, migration 0029 on both DBs) + docket <code>3ebb877</code> (388). Manage → Expenses after Leave: approve / reject (no reason) / mark paid, each undoable one step, stale moves 409. Review state in <code>expense_reviews</code> because the sign-off trigger locks expenses; <code>docket_expenses.recorded_by</code> set by docket on insert; older expenses get a "(best guess)" claimant from <code>expense_claimant_guesses</code>…</div></div>
+        </div>
+  </div>
+  <div class="footer">Generated by Hermes · 08:28</div>
+</div>
+<script>
+(function() {
+    var gate = document.getElementById('pwdGate');
+    var page = document.getElementById('summaryPage');
+    var input = document.getElementById('pwdInput');
+    var btn = document.getElementById('pwdBtn');
+    var error = document.getElementById('pwdError');
+    var PASSWORD = 'hermes';
+
+    function tryUnlock() {
+        var val = input.value;
+        if (val === PASSWORD) {
+            gate.style.display = 'none';
+            page.style.display = 'block';
+        } else {
+            error.textContent = 'Wrong password';
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') tryUnlock();
+    });
+    input.focus();
+})();
+</script>
+</body>
+</html>
