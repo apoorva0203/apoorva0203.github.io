@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☀️ Morning Summary</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%); color: #1a1a2e; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 600px; margin: 0 auto 20px; background: #ffffff; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 24px 28px; position: relative; overflow: hidden; }
+  .header::after { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+  .header::before { content: ''; position: absolute; bottom: -30px; left: 20%; width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+  .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .header .date { font-size: 13px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
+  .body { padding: 16px 16px 20px; }
+  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; margin: 0 0 14px 0; min-width: 0; }
+  .section:last-child { margin-bottom: 0; }
+
+  /* Desktop: two columns, work sections full width on top */
+  @media (min-width: 768px) {
+    body { padding: 24px; }
+    .page { max-width: 1100px; }
+    .body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 24px 24px; align-items: start; }
+    .section { margin: 0; }
+    .section-work, .section-gh, .section-slack { grid-column: 1 / -1; }
+    .section-work { order: -1; }
+    .header { padding: 28px 32px; }
+    .header h1 { font-size: 26px; }
+    .footer { padding: 12px 24px; }
+  }
+  .section-cal { border-left: 4px solid #3b82f6; }
+  .section-rem { border-left: 4px solid #10b981; }
+  .section-email { border-left: 4px solid #f59e0b; }
+  .section-slack { border-left: 4px solid #8b5cf6; }
+  .section-work { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-color: #fcd34d; }
+  .section-gh { border-left: 4px solid #ef4444; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+  .section-header .icon { font-size: 16px; }
+  .section-header .label { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: #475569; }
+  .content { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #334155; }
+  .content ul { white-space: normal; margin: 0 0 12px; padding-left: 18px; }
+  .content ul:last-child { margin-bottom: 0; }
+  .content li { margin: 0 0 6px; }
+  .content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: rgba(15,23,42,0.06); padding: 1px 5px; border-radius: 4px; }
+  .work-list { font-size: 13px; line-height: 1.55; color: #44403c; }
+  .content a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+  .content a:hover { text-decoration: underline; }
+  .content .mention { color: #8b5cf6; font-weight: 500; }
+  .empty { color: #94a3b8; font-style: italic; font-size: 13px; text-align: center; padding: 8px 0; }
+  .work-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .work-tag.done { background: #dcfce7; color: #166534; }
+  .work-tag.open { background: #fee2e2; color: #991b1b; }
+  .work-tag.progress { background: #fef9c3; color: #854d0e; }
+  .work-tag.mention { background: #fef3c7; color: #b45309; border: 1px dashed #f59e0b; }
+  .work-items { white-space: normal; font-size: 13px; line-height: 1.55; color: #44403c; margin: 0 0 12px; }
+  .work-items:last-child { margin-bottom: 0; }
+  .footer { text-align: center; padding: 10px 22px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+  .pwd-gate { position: fixed; inset: 0; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .pwd-gate .box { background: #ffffff; border-radius: 16px; padding: 36px 32px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 300px; width: 90%; }
+  .pwd-gate h2 { margin: 0 0 4px; font-size: 20px; color: #1a1a2e; font-weight: 700; }
+  .pwd-gate .lock-icon { font-size: 40px; margin-bottom: 8px; display: block; }
+  .pwd-gate p { font-size: 13px; color: #64748b; margin: 0 0 24px; }
+  .pwd-gate input { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; box-sizing: border-box; margin-bottom: 14px; transition: border-color 0.15s; }
+  .pwd-gate input:focus { outline: none; border-color: #4f46e5; }
+  .pwd-gate button { width: 100%; padding: 11px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .pwd-gate button:hover { background: #4338ca; }
+  .pwd-gate .error { color: #ef4444; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 500; }
+  .page { display: none; }
+</style>
+</head>
+<body>
+<div class="pwd-gate" id="pwdGate">
+  <div class="box">
+    <span class="lock-icon">🔒</span>
+    <h2>Locked</h2>
+    <p>Enter your morning summary password</p>
+    <input type="password" id="pwdInput" placeholder="Password" autocomplete="off">
+    <button id="pwdBtn">Unlock</button>
+    <div class="error" id="pwdError"></div>
+  </div>
+</div>
+<div class="page" id="summaryPage">
+  <div class="header">
+    <h1>☀️ Morning Summary</h1>
+    <div class="date">Saturday, October 10</div>
+  </div>
+  <div class="body">
+    
+        <div class="section section-cal">
+            <div class="section-header">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </div>
+            <div class="content">• 11:00 am — Appointment: Visit with Aussie Grooming Solutions — Work</div>
+        </div>
+        <div class="section section-email">
+            <div class="section-header">
+                <span class="icon">📧</span>
+                <span class="label">Email</span>
+            </div>
+            <div class="content">• ONLY TWO DAYS LEFT: Up to $800 OFF Roomba Combos ends tomorrow! — iRobot Australia
+• $6,000,000 TattsLotto is tonight! — Oz Lotteries
+• Skechers Insider Double Points Now Live! — Skechers
+• Bunnings run this morning? Keep an eye out for Sheetsies 👀 — CleanPost NZ
+• What is your face telling you? — Ayurda Wellness</div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub PRs</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Open PRs with pending review</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/138" target="_blank" rel="noopener">#138 ENG-5111: Forward Shopify's signed launch query to platforms/login</a> — 👀 Review: apoorva0203 (2 commits, +54/-2)</li><li><a href="https://github.com/syncio/syncio-fe/pull/137" target="_blank" rel="noopener">#137 [ENG-5054] Batch the Products page shared-inventory totals</a> — 👀 Review: Suharsh329 (1 commits, +473/-201)</li><li><a href="https://github.com/syncio/syncio-fe/pull/131" target="_blank" rel="noopener">#131 feat(ENG-4953): rebuild Product Settings on the design system</a> — 👀 Review: Suharsh329 (10 commits, +1444/-363)</li><li><a href="https://github.com/syncio/syncio-fe/pull/129" target="_blank" rel="noopener">#129 chore(e2e): add a Product Settings spec and a dispatchable staging run</a> — 👀 Review: Suharsh329 (3 commits, +254/-8)</li><li><a href="https://github.com/syncio/syncio-fe/pull/128" target="_blank" rel="noopener">#128 chore(deps)(deps-dev): bump @vitest/ui from 4.1.11 to 5.0.3</a> (1 commits, +44/-17)</li><li><a href="https://github.com/syncio/syncio-fe/pull/127" target="_blank" rel="noopener">#127 chore(deps)(deps-dev): bump msw from 2.15.0 to 3.0.1</a> (1 commits, +210/-235)</li><li><a href="https://github.com/syncio/syncio-fe/pull/126" target="_blank" rel="noopener">#126 chore(deps)(deps-dev): bump @vitest/coverage-v8 from 4.1.11 to 5.0.3</a> (1 commits, +54/-118)</li><li><a href="https://github.com/syncio/syncio-fe/pull/125" target="_blank" rel="noopener">#125 chore(deps)(deps): bump the patch-and-minor group with 12 updates</a> (1 commits, +168/-168)</li><li><a href="https://github.com/syncio/syncio-fe/pull/124" target="_blank" rel="noopener">#124 chore(deps)(deps-dev): bump vitest from 4.1.11 to 5.0.3 in the vitest group</a> (1 commits, +90/-146)</li><li><a href="https://github.com/syncio/syncio-fe/pull/122" target="_blank" rel="noopener">#122 Proxy Vite /api to local Laravel in development</a> — 👀 Review: apoorva0203 (1 commits, +9/-4)</li></ul></div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub Mentions</span>
+            </div>
+            <div class="content"><div class="work-tag mention">MENTIONS</div><ul class="work-list"><li>🔔 <a href="https://github.com/syncio/syncio-admin-fe/pull/10" target="_blank" rel="noopener">#10 [ENG-5052] Add store tracking resync workflow</a> <span style="font-size:11px;color:#94a3b8;">(mentioned)</span></li><li>🔔 <a href="https://github.com/syncio/syncio-be/pull/107" target="_blank" rel="noopener">#107 ENG-5060: Wait for adjustment history before setting push-order fulfillment location</a> <span style="font-size:11px;color:#94a3b8;">(mentioned)</span></li><li>👀 <a href="https://github.com/syncio/syncio-fe/pull/138" target="_blank" rel="noopener">#138 ENG-5111: Forward Shopify's signed launch query to platforms/login</a> <span style="font-size:11px;color:#94a3b8;">(review requested)</span></li><li>👀 <a href="https://github.com/syncio/syncio-fe/pull/122" target="_blank" rel="noopener">#122 Proxy Vite /api to local Laravel in development</a> <span style="font-size:11px;color:#94a3b8;">(review requested)</span></li></ul></div>
+        </div>
+        <div class="section section-slack">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">Slack</span>
+            </div>
+            <div class="content"><div class="work-tag progress">78 channels · last 24h</div><ul class="work-list"><li><strong>#cs_ticket_discussions</strong> <span class="mention">@U01S73A9HCH</span> about this "agent-investigate" fix. Is it just waiting for PR/ testing? <a href="https://syncio.atlassian.net/browse/ESC-2198?focusedCommentId=47166" target="_blank" rel="noopener">syncio.atlassian.net/browse/ESC-2198?…</a></li><li><strong>#cs_ticket_discussions</strong> <span class="mention">@U04GB8L148M</span> Here's today's support 1. Manually remove duplicate mapper id: <a href="https://syncio.atlassian.net/browse/ESC-2202" target="_blank" rel="noopener">[Ticket] 07/10/2026 - Manually delete stale mapper</a> • This one should be sim…</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#88] …</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-fe</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#129] …</li><li><strong>#growth_general</strong> Hey <span class="mention">@U0BCZA3N5QW</span> I’ve just created the ‘Growth’ column in the new Opps board - please use this to populate the growth-related opportunities: …</li><li><strong>#team_general</strong> Hey team, just a quick reminder that I'll be stepping away for a couple of hrs next Monday around 2PM Brisbane time (so 1PM Melb &amp; Syd time) for some health tests. I'll be starting work at 8 and f…</li><li><strong>#team_kudos</strong> <span class="mention">@U03DKE5B2KX</span> for exceeding expectations with how is is thinking through how to solve his own problems - adding and improving the CX report that he has developed. The team has rewarded him by giving …</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Syncio — Professional</span>
+            </div>
+            <div class="content"><div class="work-tag done">Thu 8 Oct — Sachin feedback rounds, ALL LIVE on test + prod, pushed</div><ul class="work-list"><li>Final tips: planner <code>b1fe290</code>, docket <code>dedf814</code>. Migrations 0030 + 0031 on both DBs. Prod bookmarks before 0030 <code>00000036-0000001a-000050fe-d5ed013ac5d40226d79c00c4f0ebd36c</code>, before 0031 <code>00000039-00000000-000050fe-62bd7f4f9b175c8235d7284f5625c1b8</code>. Prod migrate/deploy worked from this session once Apoorva asked explicitly.</li><li>Round 1 (<code>3d10152</code>/<code>5c2ea3d</code>): Manage → Job types (six project types, civil = Civil Projects, type editable until docket row exists), clock on project type + clock off Site/Travel/Meals/LAFHA + comment, Manage → Company (admin save; T&amp;Cs drafted by me — Sachin's solicitor should check), Vamp-style docket PDF (orange #ff561a), terminal statuses may have exits, compliance docs in docket, Send = one email per person (Sachin rejected BCC, CC and multi-To).</li><li>Then: clock on to "Other" (<code>a74fbf6</code>/<code>cb9e147</code>); docket share sheet for PDFs + orange active shift (<code>71b6d7e</code>); clock approvals + Expenses-style filters on Leave/Clock/Invoicing + search on all Manage tables + docket Clock/History/Expenses tabs + job-list search (<code>b1fe290</code>/<code>dedf814</code>). Bell: one item per clocked-off shift, nothing on clock on.</li><li>Decisions: concurrent clock approvals stay last-write-wins like leave; crane banner keeps phone painted over; expense decisions not in docket Updates (never pushed).</li><li>Apoorva tested prod signed in on 8 Oct: all OK.</li><li>Deferred by Apoorva ("leave it for now"): T&amp;Cs solicitor check; docket Completed list cut-off.</li></ul><div class="work-tag open">STILL OPEN</div><ul class="work-list"><li>Payment of the final invoice (14 day terms, due ~15 Oct); ownership passes on receipt.</li><li>Sachin + Stephanie accept GitHub owner invites.</li><li>Defect window to 15 Oct — handle any reports Sachin sends; after that $110/hr.</li><li>Written reference from Sachin (quotation clause 4) + permission to show the apps.</li><li>Never tried on a real phone: passkeys; unsent work surviving a closed app.</li><li>Accepted nits: useAdminStore.load no latest-request guard; docket sync-auth.mjs ignores --check; two phones on one job can strand an unsent on the second. Custom domains deferred.</li><li><strong>Syncio:</strong> see daily-context-syncio.</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Direct Cranes — Personal</span>
+            </div>
+            <div class="content"><div class="work-tag progress">DIRECT CRANES — LATEST</div><div class="work-items"><strong>8 Oct 2026 — Sachin's feedback rounds LIVE on test + prod, pushed, Apoorva tested prod signed in: all OK.</strong> Final tips planner <code>b1fe290</code>, docket <code>dedf814</code>; migrations 0030 (job types + clock answers + company_settings) and 0031 (clock approvals) on both DBs. Built: Manage → Job types (six project types seeded, type editable until a docket row exists), clock on needs project type / Other (no job), clock off needs Site/Travel/Meals/LAFHA yes/no/na + comment, clock approvals (approve/decline one…</div></div>
+        </div>
+  </div>
+  <div class="footer">Generated by Hermes · 08:00</div>
+</div>
+<script>
+(function() {
+    var gate = document.getElementById('pwdGate');
+    var page = document.getElementById('summaryPage');
+    var input = document.getElementById('pwdInput');
+    var btn = document.getElementById('pwdBtn');
+    var error = document.getElementById('pwdError');
+    var PASSWORD = 'hermes';
+
+    function tryUnlock() {
+        var val = input.value;
+        if (val === PASSWORD) {
+            gate.style.display = 'none';
+            page.style.display = 'block';
+        } else {
+            error.textContent = 'Wrong password';
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') tryUnlock();
+    });
+    input.focus();
+})();
+</script>
+</body>
+</html>
