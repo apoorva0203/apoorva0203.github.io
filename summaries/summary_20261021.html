@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☀️ Morning Summary</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%); color: #1a1a2e; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 600px; margin: 0 auto 20px; background: #ffffff; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 24px 28px; position: relative; overflow: hidden; }
+  .header::after { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+  .header::before { content: ''; position: absolute; bottom: -30px; left: 20%; width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+  .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .header .date { font-size: 13px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
+  .body { padding: 16px 16px 20px; }
+  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; margin: 0 0 14px 0; min-width: 0; }
+  .section:last-child { margin-bottom: 0; }
+
+  /* Desktop: two columns, work sections full width on top */
+  @media (min-width: 768px) {
+    body { padding: 24px; }
+    .page { max-width: 1100px; }
+    .body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 24px 24px; align-items: start; }
+    .section { margin: 0; }
+    .section-work, .section-gh, .section-slack { grid-column: 1 / -1; }
+    .section-work { order: -1; }
+    .header { padding: 28px 32px; }
+    .header h1 { font-size: 26px; }
+    .footer { padding: 12px 24px; }
+  }
+  .section-cal { border-left: 4px solid #3b82f6; }
+  .section-rem { border-left: 4px solid #10b981; }
+  .section-email { border-left: 4px solid #f59e0b; }
+  .section-slack { border-left: 4px solid #8b5cf6; }
+  .section-work { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-color: #fcd34d; }
+  .section-gh { border-left: 4px solid #ef4444; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+  .section-header .icon { font-size: 16px; }
+  .section-header .label { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: #475569; }
+  .content { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #334155; }
+  .content ul { white-space: normal; margin: 0 0 12px; padding-left: 18px; }
+  .content ul:last-child { margin-bottom: 0; }
+  .content li { margin: 0 0 6px; }
+  .content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: rgba(15,23,42,0.06); padding: 1px 5px; border-radius: 4px; }
+  .work-list { font-size: 13px; line-height: 1.55; color: #44403c; }
+  .content a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+  .content a:hover { text-decoration: underline; }
+  .content .mention { color: #8b5cf6; font-weight: 500; }
+  .empty { color: #94a3b8; font-style: italic; font-size: 13px; text-align: center; padding: 8px 0; }
+  .work-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .work-tag.done { background: #dcfce7; color: #166534; }
+  .work-tag.open { background: #fee2e2; color: #991b1b; }
+  .work-tag.progress { background: #fef9c3; color: #854d0e; }
+  .work-tag.mention { background: #fef3c7; color: #b45309; border: 1px dashed #f59e0b; }
+  .work-items { white-space: normal; font-size: 13px; line-height: 1.55; color: #44403c; margin: 0 0 12px; }
+  .work-items:last-child { margin-bottom: 0; }
+  .footer { text-align: center; padding: 10px 22px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+  .pwd-gate { position: fixed; inset: 0; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .pwd-gate .box { background: #ffffff; border-radius: 16px; padding: 36px 32px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 300px; width: 90%; }
+  .pwd-gate h2 { margin: 0 0 4px; font-size: 20px; color: #1a1a2e; font-weight: 700; }
+  .pwd-gate .lock-icon { font-size: 40px; margin-bottom: 8px; display: block; }
+  .pwd-gate p { font-size: 13px; color: #64748b; margin: 0 0 24px; }
+  .pwd-gate input { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; box-sizing: border-box; margin-bottom: 14px; transition: border-color 0.15s; }
+  .pwd-gate input:focus { outline: none; border-color: #4f46e5; }
+  .pwd-gate button { width: 100%; padding: 11px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .pwd-gate button:hover { background: #4338ca; }
+  .pwd-gate .error { color: #ef4444; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 500; }
+  .page { display: none; }
+</style>
+</head>
+<body>
+<div class="pwd-gate" id="pwdGate">
+  <div class="box">
+    <span class="lock-icon">🔒</span>
+    <h2>Locked</h2>
+    <p>Enter your morning summary password</p>
+    <input type="password" id="pwdInput" placeholder="Password" autocomplete="off">
+    <button id="pwdBtn">Unlock</button>
+    <div class="error" id="pwdError"></div>
+  </div>
+</div>
+<div class="page" id="summaryPage">
+  <div class="header">
+    <h1>☀️ Morning Summary</h1>
+    <div class="date">Wednesday, October 21</div>
+  </div>
+  <div class="body">
+    
+        <div class="section section-cal">
+            <div class="section-header">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </div>
+            <div class="content">• 11:00 am — Tedx Syncio Talk — apoorva@syncio.co
+• 1:00 pm — DC-4028 · Acciona — Direct Cranes jobs</div>
+        </div>
+        <div class="section section-email">
+            <div class="section-header">
+                <span class="icon">📧</span>
+                <span class="label">Email</span>
+            </div>
+            <div class="content">• Snap It: An Easy Way to Log Your Meals 📷✨ — Lose It!
+• The Wait For Bronze Is Over ✨ — Huda Beauty
+• In 14 days, people in your business portfolio can start managing Meta One — Meta for Business
+• Last Chance For $50 Off* | You're At The Top Of Our List — City Chic
+• Stop Scrolling ✨ $79* Dresses: Style Steals — City Chic</div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub PRs</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Open PRs with pending review</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/145" target="_blank" rel="noopener">#145 fix(products): Unsync and Keep for Warning products, close details sidebar on fetch errors (ENG-5151)</a> (1 commits, +50/-16)</li><li><a href="https://github.com/syncio/syncio-fe/pull/144" target="_blank" rel="noopener">#144 Release/v7.6.1</a> — 💬 Reviewed by: apoorva0203 (9 commits, +2917/-1130)</li><li><a href="https://github.com/syncio/syncio-fe/pull/140" target="_blank" rel="noopener">#140 fix: Black Friday failure handling, plus ENG-5108, ENG-4130 and ENG-5090 to 5093</a> — 👀 Review: Suharsh329 (18 commits, +1457/-462)</li></ul></div>
+        </div>
+        <div class="section section-slack">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">Slack</span>
+            </div>
+            <div class="content"><div class="work-tag progress">80 channels · last 24h</div><ul class="work-list"><li><strong>#cs_ticket_discussions</strong> <span class="mention">@U01S73A9HCH</span> were you able to connect with this user (<a href="https://syncio.atlassian.net/browse/ESC-2199" target="_blank" rel="noopener">[Ticket] Woo - Installation Blocked - Security Plugin?</a>) For the woo install? I'll close the ticke…</li><li><strong>#cs_ticket_discussions</strong> I am still working on this , today we had a call and resolved the permission issue now working on installation</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#149] …</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-fe</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#140] …</li><li><strong>#growth_general</strong> Interesting stuff regarding Shopify appstore market: • Shopify keeps winning new shops, but new apps are released even faster. Each app’s slice of the pie shrinks, even as the pie grows. …</li><li><strong>#team_general</strong> Switching on your eyesight is optional for tomorrow's TedX talk. We'll be visiting the inner universe :milky_way:</li><li><strong>#team_random</strong> Shopify tells Australian store to stay shut after hijacked extensions divert shoppers - iTnews <a href="https://share.google/y1kS19DwAoECLyktg" target="_blank" rel="noopener">https://share.google/y1kS19DwAoECLyktg</a> • Seems like there's bunch of apps had a compromised plugin.</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Syncio — Professional</span>
+            </div>
+            <div class="content"><div class="work-tag done">Tue 20 Oct</div><ul class="work-list"><li><strong>ENG-5153 PUSHED as <code>791de241</code></strong> on <code>bugfix/ENG-5153-catalogs-pagination</code> (worktree <code>~/syncio-fe-5153</code>, off release/v7.6.1 incl. today's e2e fixes): shared <code>Pagination</code> (like Stores/picker, 25/50/100, limiter in URL unless 25), past-the-end page recovery, zero-share delete refetches; FE integration test + zod schemas; e2e signs in TEST_SOURCE_STORE_URL (source store, Catalogs opted in, Apoorva added &gt;25 catalogs) via a <code>storeRole</code> fixture and checks page 2. 3 review rounds → clean. <strong>Apoorva 20 Oct: ships AFTER v7.6.1 is released and merged to main</strong> — then rebase onto main (<code>git rebase --onto origin/main origin/release/v7.6.1</code>, see stack-restack-playbook) and the PR targets <strong>main</strong>, not the release. Hold until then; staging deploy + E2E ref=branch grep <code>Catalogs</code> is still the check. Staging E2E full suite green 20 Oct (93 pass, 16 skip) after e2e fixes <code>4b88d150</code>/<code>bb72bab7</code>/<code>5b9fd7a7</code>/<code>b6578bb1</code> on release/v7.6.1. catalogs-pagination-bug <strong>ENG-4612 PR: Apoorva said wait</strong> (don't nudge). <strong>Sentry on staging: NO</strong> (Apoorva 20 Oct) — stays production-only. Also on the todo list: feature-confidence-report.</li><li><strong>Mapped-test coverage in the QA app SHIPPED as <code>2e69e48</code></strong> (syncio-qa-app main; migration 0024 applied to prod by the pre-push hook — first attempt failed with a transient Cloudflare 7403, retry fine). Replaces the tag approach: the syncio-be <code>#[Group('flow:…')]</code> branch was <strong>dropped</strong> (never pushed; patch kept in the 19-Oct session scratchpad <code>eng-4694-phpunit-flow-tags.patch</code>). Flows carry <code>phpunit_tests</code> ("tests/…/FooTest.php::test_method", checked on syncio-be master) and <code>fe_unit_tests</code> ("src/…/foo.test.js::it() name", checked on the app's FE repo <strong>main</strong>); badge only when every mapped test exists, else "mapped test not found". Skipped (<code>markTestSkipped/Incomplete</code>, incl. in setUp) and commented-out tests don't count; it.each names can't match. Needs column shows "—" for any covered flow incl. Playwright (Apoorva's ask; side effect: no need dropdown on those rows). Live: PHPUnit 4 (c96cf977, bb66f6db, fa882abb, a2c18e7a); FE Unit 0 + 5 "not found" until ENG-4612 reaches main. Two QA-app review rounds → clean.</li><li><strong>FE audit:</strong> of 66 Core flows, 0 fully covered by existing vitest, 12 partial, 54 not FE-testable. 4940bb1c's text describes Settings toggles that don't exist → rewrite the flow.</li><li><strong><code>feature/ENG-4612-flow-unit-tests</code> PUSHED as <code>4e99cafc</code></strong> (worktree <code>~/syncio-fe-4612</code>, based on release/v7.6.1 incl. <code>4b88d150</code>). <strong>Apoorva to open the PR → release/v7.6.1</strong> (PR body given in chat). Contents: 16 component tests completing ab1ae456, ba649ba4, afbb3135, 8b232369, 2af992c9 (30/30 mutations); <strong>400/422 reported to Sentry</strong> as warnings with the backend reason (4xx only; reason handles string <code>errors</code>); billing redirect, duplicate SKU and Woo sign-in email 422 stay unreported (billing 400 hits every plan-less install); SYNCIO.md updated. Reviewer clean after 2 rounds. FE badges appear only once release/v7.6.1 merges to main.</li><li><strong><code>4b88d150</code> pushed straight to release/v7.6.1 (Apoorva's yes):</strong> playwright.config.js loads <code>.env.e2e</code> only if it exists — on Node 24 <code>process.loadEnvFile?.()</code> threw ENOENT and failed every E2E run. Release branch is unprotected.</li><li><strong>Playwright on staging:</strong> deploy release/v7.6.1 to staging (Deploy workflow), then E2E with ref release/v7.6.1 + environment staging (QA app E2E Runs or Actions). Ref only picks spec code.</li></ul><div class="work-tag open">STILL OPEN</div><ul class="work-list"><li>QA app Reporting <code>defaultBase</code> 'main' → 'master' (and it isn't an FE repo) — offered.</li><li>Product Sync Playwright (fake backend) on ENG-4694 — not started. Reporting-service tests: reporting-tests-scope.</li><li>Sentry post-deploy checks after v7.6.1 prod deploy: source-map upload line in the Build log (a 401 still exits 0), one test error; then watch 400/422 warnings. See syncio-fe-sentry.</li><li>admin-fe#17 paid-only recipe still unconfirmed with Suharsh; hold the Sensei Slack announcement until documented.</li><li>Uncarded stuck-loading: marketPlace fetchProducts/fetchCountries/fetchSpotlightProfile, SourceStorePricingDialog. Follow-up: <code>Sentry.captureException</code> in #140's bare catches.</li><li>Invitation status badges never seen with real data. Product questions: PRO on-request rows show no switch; catalog unshare copy; Upgrade button border variant. Parked: Products page partner store id (<code>stash@{0}</code> in <code>~/syncio-fe</code>).</li><li>Rulings not to re-raise: buffer off after quantity edit skips <code>inventory-safety-net-add</code>; ENG-5108 modal 20px gap.</li><li>syncio-fe-next-bugfix-card.</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Direct Cranes — Personal</span>
+            </div>
+            <div class="content"><div class="work-tag progress">DIRECT CRANES — LATEST</div><div class="work-items"><strong>20 Oct 2026 evening — Docket templates (paid, $880) ON TEST, UNCOMMITTED.</strong> Migrations 0036–0038 on direct-cranes-test only; code in scratchpad worktrees branch <code>docket-templates</code>. See direct-cranes-docket-templates.</div><div class="work-tag open">DIRECT CRANES — STILL OPEN</div><ul class="work-list"><li>Handover's office-completion entry still says "Not released as at 14 Oct" (it is live); fix only if a planner commit ever goes out.</li><li>Sachin + Stephanie accepting GitHub owner invites; written reference from Sachin (quotation clause 4) + permission to show the apps.</li><li>Never tried on a real phone: passkeys; camera steps; unsent work surviving a closed app.</li><li>Accepted nits: useAdminStore.load no latest-request guard; docket sync-auth.mjs ignores --check; two phones on one job can strand an unsent on the second. Custom domains deferred.</li><li><strong>Syncio:</strong> see daily-context-syncio.</li></ul></div>
+        </div>
+  </div>
+  <div class="footer">Generated by Hermes · 08:00</div>
+</div>
+<script>
+(function() {
+    var gate = document.getElementById('pwdGate');
+    var page = document.getElementById('summaryPage');
+    var input = document.getElementById('pwdInput');
+    var btn = document.getElementById('pwdBtn');
+    var error = document.getElementById('pwdError');
+    var PASSWORD = 'hermes';
+
+    function tryUnlock() {
+        var val = input.value;
+        if (val === PASSWORD) {
+            gate.style.display = 'none';
+            page.style.display = 'block';
+        } else {
+            error.textContent = 'Wrong password';
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') tryUnlock();
+    });
+    input.focus();
+})();
+</script>
+</body>
+</html>
