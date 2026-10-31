@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☀️ Morning Summary</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%); color: #1a1a2e; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 600px; margin: 0 auto 20px; background: #ffffff; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 24px 28px; position: relative; overflow: hidden; }
+  .header::after { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+  .header::before { content: ''; position: absolute; bottom: -30px; left: 20%; width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+  .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .header .date { font-size: 13px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
+  .body { padding: 16px 16px 20px; }
+  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; margin: 0 0 14px 0; min-width: 0; }
+  .section:last-child { margin-bottom: 0; }
+
+  /* Desktop: two columns, work sections full width on top */
+  @media (min-width: 768px) {
+    body { padding: 24px; }
+    .page { max-width: 1100px; }
+    .body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 24px 24px; align-items: start; }
+    .section { margin: 0; }
+    .section-work, .section-gh, .section-slack { grid-column: 1 / -1; }
+    .section-work { order: -1; }
+    .header { padding: 28px 32px; }
+    .header h1 { font-size: 26px; }
+    .footer { padding: 12px 24px; }
+  }
+  .section-cal { border-left: 4px solid #3b82f6; }
+  .section-rem { border-left: 4px solid #10b981; }
+  .section-email { border-left: 4px solid #f59e0b; }
+  .section-slack { border-left: 4px solid #8b5cf6; }
+  .section-work { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-color: #fcd34d; }
+  .section-gh { border-left: 4px solid #ef4444; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+  .section-header .icon { font-size: 16px; }
+  .section-header .label { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: #475569; }
+  .content { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #334155; }
+  .content ul { white-space: normal; margin: 0 0 12px; padding-left: 18px; }
+  .content ul:last-child { margin-bottom: 0; }
+  .content li { margin: 0 0 6px; }
+  .content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: rgba(15,23,42,0.06); padding: 1px 5px; border-radius: 4px; }
+  .work-list { font-size: 13px; line-height: 1.55; color: #44403c; }
+  .content a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+  .content a:hover { text-decoration: underline; }
+  .content .mention { color: #8b5cf6; font-weight: 500; }
+  .empty { color: #94a3b8; font-style: italic; font-size: 13px; text-align: center; padding: 8px 0; }
+  .work-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .work-tag.done { background: #dcfce7; color: #166534; }
+  .work-tag.open { background: #fee2e2; color: #991b1b; }
+  .work-tag.progress { background: #fef9c3; color: #854d0e; }
+  .work-tag.mention { background: #fef3c7; color: #b45309; border: 1px dashed #f59e0b; }
+  .work-items { white-space: normal; font-size: 13px; line-height: 1.55; color: #44403c; margin: 0 0 12px; }
+  .work-items:last-child { margin-bottom: 0; }
+  .footer { text-align: center; padding: 10px 22px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+  .pwd-gate { position: fixed; inset: 0; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .pwd-gate .box { background: #ffffff; border-radius: 16px; padding: 36px 32px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 300px; width: 90%; }
+  .pwd-gate h2 { margin: 0 0 4px; font-size: 20px; color: #1a1a2e; font-weight: 700; }
+  .pwd-gate .lock-icon { font-size: 40px; margin-bottom: 8px; display: block; }
+  .pwd-gate p { font-size: 13px; color: #64748b; margin: 0 0 24px; }
+  .pwd-gate input { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; box-sizing: border-box; margin-bottom: 14px; transition: border-color 0.15s; }
+  .pwd-gate input:focus { outline: none; border-color: #4f46e5; }
+  .pwd-gate button { width: 100%; padding: 11px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .pwd-gate button:hover { background: #4338ca; }
+  .pwd-gate .error { color: #ef4444; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 500; }
+  .page { display: none; }
+</style>
+</head>
+<body>
+<div class="pwd-gate" id="pwdGate">
+  <div class="box">
+    <span class="lock-icon">🔒</span>
+    <h2>Locked</h2>
+    <p>Enter your morning summary password</p>
+    <input type="password" id="pwdInput" placeholder="Password" autocomplete="off">
+    <button id="pwdBtn">Unlock</button>
+    <div class="error" id="pwdError"></div>
+  </div>
+</div>
+<div class="page" id="summaryPage">
+  <div class="header">
+    <h1>☀️ Morning Summary</h1>
+    <div class="date">Sunday, November 01</div>
+  </div>
+  <div class="body">
+    
+        <div class="section section-cal">
+            <div class="section-header">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </div>
+            <div class="content"><p class="empty">No calendar events today</p></div>
+        </div>
+        <div class="section section-email">
+            <div class="section-header">
+                <span class="icon">📧</span>
+                <span class="label">Email</span>
+            </div>
+            <div class="content">• Your Sale Favourites Are Waiting — Skechers
+• [Personal] Your Saturday evening order with Uber Eats — Uber Receipts
+• Order &amp; Pay is Back — Starbucks New Zealand
+• For The Diwali Invitations ✨ — Interflora
+• Just HOURS LEFT! — PETA India</div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub PRs</span>
+            </div>
+            <div class="content"><p class="empty">No open PRs</p></div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub Mentions</span>
+            </div>
+            <div class="content"><div class="work-tag mention">MENTIONS</div><ul class="work-list"><li>🔔 <a href="https://github.com/syncio/syncio-be/pull/174" target="_blank" rel="noopener">#174 [ENG-5213] Fix failed order pushes never retrying</a> <span style="font-size:11px;color:#94a3b8;">(mentioned)</span></li><li>🔔 <a href="https://github.com/syncio/syncio-be/pull/170" target="_blank" rel="noopener">#170 Woo pre-install reachability check for Cloudflare-blocked stores</a> <span style="font-size:11px;color:#94a3b8;">(mentioned)</span></li></ul></div>
+        </div>
+        <div class="section section-slack">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">Slack</span>
+            </div>
+            <div class="content"><p class="empty">No recent Slack activity</p></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Syncio — Professional</span>
+            </div>
+            <div class="content"><div class="work-tag done">Fri 30 Oct</div><ul class="work-list"><li><strong>fe <code>bugfix/sentry-found-bugs</code> PUSHED</strong> (off main ac2c9698; Apoorva asked for one branch, card numbers in commits): <code>cdccb9c9</code> ENG-5168 (VUE-12 Plans.vue null selectedAddonIds), <code>22d5559c</code> ENG-5167 (VUE-Y sendMessage <code>?? {}</code>), <code>7321f391</code> ENG-5214 (VUE-2A copyToClipBoard catches refusal → "Unable to copy. Copy it manually." toast, callers toast success only on true). Two syncio-reviewer passes clean after fixes. Apoorva opens the PR (target main?). Manual Jira steps given for all three.</li><li>ENG-5143 → backlog (needs designer). ENG-5169 (VUE-6 PrimeVue focustrap null.nextSibling): no Stores-page dialog reproduces it in a real-PrimeVue test (harness catches via process 'uncaughtException', not window error); needs Sentry breadcrumbs/replay to find the dialog; fix = move that dialog to shadcn. PrimeVue stays 3.32.2 (feedback-primevue-no-upgrade).</li><li>be#174 = ENG-5213 (order push retry), title/description set. Product Finder test plan v7 + flow PDF on Desktop (project-product-finder-sync-ready).</li><li>VUE-17 (addonsSummary wiped by late fetchCurrentPlan) still has NO card — ENG-5168 is VUE-12.</li><li><strong>ENG-5045 PUSHED</strong> <code>ec671704</code> on <code>bugfix/ENG-5045-payouts-actions-cell</code> (off main): SS payouts Open/Complete (+skeletons) Actions Column <code>flex justify-content-end</code> → <code>text-right</code> + inner <code>div.flex justify-content-end</code> (design unchanged, cell fills row). Review clean. DS Paid/Unpaid have the same bug — Apoorva: fix only what's reported, left alone. Apoorva opens the PR.</li><li><strong>ENG-5154 PUSHED</strong> <code>3addacfe</code> on <code>bugfix/ENG-5154-inventory-location-link</code> (off main): Product details Quantity tooltip "Inventory Location" → help article 15724222-multi-locations-2026-update; test pins it. Apoorva opens the PR.</li></ul><div class="work-tag open">STILL OPEN</div><ul class="work-list"><li>Open questions to Apoorva: change 8df54c5a step 2 to "sync is refused" (→ Covered)? re-run seeder <code>mismatch</code>? c07203ae 24h metafield-values lock question for BE devs.</li><li>Possible cards (Apoorva creates): upgrade popup "Manage Plan" push/replace race; PlanApproval "Go To Shopify Approval" silent no-op; VUE-17 fix.</li><li><code>chore/sentry-alert-levels</code> MERGED as fe#150 into release/v7.6.2 (checked 27 Oct); ENG-5153 merged as fe#147. release/v7.6.2 → main not yet opened. sendMessage.js 422 crash fix needs a branch/card.</li><li>BE: order push retry bug (red tests <code>fee7f896</code>, awaiting fixer) project-order-push-retry-bug; payout email tests <code>919b3651</code>; role-switch bug + store repairs (localisation-test, 4331) reference-e2e-test-stores.</li><li><strong>TODO, unblocked 27 Oct (v7.6.2 in main): bulk commission E2E</strong> — 422 + 500 on bulk commission save, added to <code>e2e/tests/failure-handling.spec.js</code>. The 22 Oct draft lived uncommitted in <code>/tmp/claude-501/rel762</code>, which was already gone by 27 Oct → rewrite from scratch. QA app has NO bulk commission flow yet; add one and tag it. Needs a card/branch name. <strong>Sentry check 27 Oct (90d, via browser session API): ZERO events on any commission/payout path</strong> — 4xx reporting is live in prod (other 400/422 issues present), so the "400 shows complete" bug has no evidence yet. Feature confidence report / ledger daily update feature-confidence-report.</li><li>Local DB: KEEP the 32 "Local pager" catalogs on store 11126.</li><li>Rulings not to re-raise: buffer off after quantity edit skips <code>inventory-safety-net-add</code>; ENG-5108 modal 20px gap; on-hold #1019 no card; keep shared Pagination.vue.</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">🩺</span>
+                <span class="label">Feature stability — overnight</span>
+            </div>
+            <div class="content"><div class="work-tag open">New bugs · 1</div><ul class="work-list"><li><a href="https://syncio.atlassian.net/browse/ESC-2228" target="_blank" rel="noopener">ESC-2228</a> Inventory / Multi-Location / OOS-BIS: Destination store orders did not adjust inventory on the source store even though the SKUs and locations match and the orders/create webhook was logged. 🔺</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Direct Cranes — Personal</span>
+            </div>
+            <div class="content"><div class="work-tag progress">DIRECT CRANES — LATEST</div><div class="work-items"><strong>20 Oct 2026 evening — Docket templates (paid, $880) ON TEST, UNCOMMITTED.</strong> Migrations 0036–0038 on direct-cranes-test only; code in scratchpad worktrees branch <code>docket-templates</code>. See direct-cranes-docket-templates.</div><div class="work-tag open">DIRECT CRANES — STILL OPEN</div><ul class="work-list"><li>Handover's office-completion entry still says "Not released as at 14 Oct" (it is live); fix with the next planner commit.</li><li>Sachin + Stephanie accepting GitHub owner invites; written reference from Sachin (quotation clause 4) + permission to show the apps.</li><li>Never tried on a real phone: passkeys; camera steps; unsent work surviving a closed app.</li><li>Accepted nits: useAdminStore.load no latest-request guard; docket sync-auth.mjs ignores --check. Custom domains deferred.</li><li><strong>Syncio:</strong> see daily-context-syncio.</li></ul></div>
+        </div>
+  </div>
+  <div class="footer">Generated by Hermes · 08:00</div>
+</div>
+<script>
+(function() {
+    var gate = document.getElementById('pwdGate');
+    var page = document.getElementById('summaryPage');
+    var input = document.getElementById('pwdInput');
+    var btn = document.getElementById('pwdBtn');
+    var error = document.getElementById('pwdError');
+    var PASSWORD = 'hermes';
+
+    function tryUnlock() {
+        var val = input.value;
+        if (val === PASSWORD) {
+            gate.style.display = 'none';
+            page.style.display = 'block';
+        } else {
+            error.textContent = 'Wrong password';
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') tryUnlock();
+    });
+    input.focus();
+})();
+</script>
+</body>
+</html>
