@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☀️ Morning Summary</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%); color: #1a1a2e; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 600px; margin: 0 auto 20px; background: #ffffff; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 24px 28px; position: relative; overflow: hidden; }
+  .header::after { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+  .header::before { content: ''; position: absolute; bottom: -30px; left: 20%; width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+  .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .header .date { font-size: 13px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
+  .body { padding: 16px 16px 20px; }
+  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; margin: 0 0 14px 0; min-width: 0; }
+  .section:last-child { margin-bottom: 0; }
+
+  /* Desktop: two columns, work sections full width on top */
+  @media (min-width: 768px) {
+    body { padding: 24px; }
+    .page { max-width: 1100px; }
+    .body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 24px 24px; align-items: start; }
+    .section { margin: 0; }
+    .section-work, .section-gh, .section-slack { grid-column: 1 / -1; }
+    .section-work { order: -1; }
+    .header { padding: 28px 32px; }
+    .header h1 { font-size: 26px; }
+    .footer { padding: 12px 24px; }
+  }
+  .section-cal { border-left: 4px solid #3b82f6; }
+  .section-rem { border-left: 4px solid #10b981; }
+  .section-email { border-left: 4px solid #f59e0b; }
+  .section-slack { border-left: 4px solid #8b5cf6; }
+  .section-work { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-color: #fcd34d; }
+  .section-gh { border-left: 4px solid #ef4444; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+  .section-header .icon { font-size: 16px; }
+  .section-header .label { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: #475569; }
+  .content { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #334155; }
+  .content ul { white-space: normal; margin: 0 0 12px; padding-left: 18px; }
+  .content ul:last-child { margin-bottom: 0; }
+  .content li { margin: 0 0 6px; }
+  .content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: rgba(15,23,42,0.06); padding: 1px 5px; border-radius: 4px; }
+  .work-list { font-size: 13px; line-height: 1.55; color: #44403c; }
+  .content a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+  .content a:hover { text-decoration: underline; }
+  .content .mention { color: #8b5cf6; font-weight: 500; }
+  .empty { color: #94a3b8; font-style: italic; font-size: 13px; text-align: center; padding: 8px 0; }
+  .work-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .work-tag.done { background: #dcfce7; color: #166534; }
+  .work-tag.open { background: #fee2e2; color: #991b1b; }
+  .work-tag.progress { background: #fef9c3; color: #854d0e; }
+  .work-tag.mention { background: #fef3c7; color: #b45309; border: 1px dashed #f59e0b; }
+  .work-items { white-space: normal; font-size: 13px; line-height: 1.55; color: #44403c; margin: 0 0 12px; }
+  .work-items:last-child { margin-bottom: 0; }
+  .footer { text-align: center; padding: 10px 22px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+  .pwd-gate { position: fixed; inset: 0; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .pwd-gate .box { background: #ffffff; border-radius: 16px; padding: 36px 32px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 300px; width: 90%; }
+  .pwd-gate h2 { margin: 0 0 4px; font-size: 20px; color: #1a1a2e; font-weight: 700; }
+  .pwd-gate .lock-icon { font-size: 40px; margin-bottom: 8px; display: block; }
+  .pwd-gate p { font-size: 13px; color: #64748b; margin: 0 0 24px; }
+  .pwd-gate input { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; box-sizing: border-box; margin-bottom: 14px; transition: border-color 0.15s; }
+  .pwd-gate input:focus { outline: none; border-color: #4f46e5; }
+  .pwd-gate button { width: 100%; padding: 11px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .pwd-gate button:hover { background: #4338ca; }
+  .pwd-gate .error { color: #ef4444; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 500; }
+  .page { display: none; }
+</style>
+</head>
+<body>
+<div class="pwd-gate" id="pwdGate">
+  <div class="box">
+    <span class="lock-icon">🔒</span>
+    <h2>Locked</h2>
+    <p>Enter your morning summary password</p>
+    <input type="password" id="pwdInput" placeholder="Password" autocomplete="off">
+    <button id="pwdBtn">Unlock</button>
+    <div class="error" id="pwdError"></div>
+  </div>
+</div>
+<div class="page" id="summaryPage">
+  <div class="header">
+    <h1>☀️ Morning Summary</h1>
+    <div class="date">Saturday, November 14</div>
+  </div>
+  <div class="body">
+    
+        <div class="section section-cal">
+            <div class="section-header">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </div>
+            <div class="content"><p class="empty">No calendar events today</p></div>
+        </div>
+        <div class="section section-email">
+            <div class="section-header">
+                <span class="icon">📧</span>
+                <span class="label">Email</span>
+            </div>
+            <div class="content">• $6,000,000 TattsLotto is tonight! — Oz Lotteries
+• New Tender Notifications — Tenders VIC
+• Freeform editing is here in Gamma 5 — Gamma
+• Black Friday Sale now on: Save up to $1,600 on Roomba! — iRobot New Zealand
+• New! Meet Artlist Academy — Artlist</div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub PRs</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Open PRs</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/175" target="_blank" rel="noopener">#175 Feature/eng 5271 prod smoke specs</a> (5 commits, +960/-73)</li></ul></div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">My PRs — feedback</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Since Fri 08:00</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/175" target="_blank" rel="noopener">FE #175 Feature/eng 5271 prod smoke specs</a> — 🆕 3 new comments (bot ×3) | ⚠️ 1 unresolved, 1 waiting on you</li></ul></div>
+        </div>
+        <div class="section section-slack">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">Slack</span>
+            </div>
+            <div class="content"><div class="work-tag progress">82 channels · last 24h</div><ul class="work-list"><li><strong>#cs_ticket_discussions</strong> <span class="mention">@U02DSB27W2Z</span> CC <span class="mention">@UCUK52M4M</span> Update on today’s support : <a href="https://syncio.atlassian.net/browse/ESC-2220?focusedCommentId=47607" target="_blank" rel="noopener">syncio.atlassian.net/browse/ESC-2220?…</a></li><li><strong>#cs_ticket_discussions</strong> Hi <span class="mention">@U02DSB27W2Z</span> <span class="mention">@U03DKE5B2KX</span> the ticket. …</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#160] …</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#160] …</li><li><strong>#team_random</strong> Uh Oh! Bad day for Microsoft with Outlook down</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Syncio — Professional</span>
+            </div>
+            <div class="content"><div class="work-tag done">Tue 10 – Wed 11 Nov</div><ul class="work-list"><li><strong>be#194 (ENG-5220/5262) MERGED</strong> into release/v8.2.8 (11 Nov 04:57Z). Last round: bulk/scan/command pushes pass <code>startsNewRetrySchedule: true</code> to PushDestinationOrderToAllSourceStore V1/V2, which resets per source only at dispatch (early exits keep the queued retry); flag defaults <code>false</code> (old queued payloads); order-wide generation key removed. One-off after deploy: 72h expiry on legacy <code>push-order-retry-*-count</code> keys (ops).</li><li><strong>Staging BE release <code>20261111045830</code> live from 15:58 AEDT 11 Nov</strong> = first with ENG-5201/5203/5205/5220 (release path visible in staging error traces in New Relic). Previous <code>20261109201105</code>.</li><li><strong>FE release/v7.6.5:</strong> <code>5cb6d96e</code> pushed directly (no card, Apoorva's call): Plan Summary $0 instead of $NaN when no plan picked + Next disabled until a plan is picked (incl. select-plan route). Staging FE was on <code>22cd2cdf</code> at test time.</li><li><strong>QA done on staging 11 Nov</strong> (summaries given to Apoorva to paste): - FE ENG-5232/5234/5235 pass; ENG-5233 untestable on staging (Sentry prod-only build). - ENG-5205 all 8 scenarios pass (6 via lang-ds + us-500-error logins; 8 via us-500-error order). Deprecation drops = prod-only check.</li><li><strong>New Relic:</strong> Apoorva is logged in (Chrome). Staging logs ARE in account 3282134 (EU UI one.eu.newrelic.com): hosts <code>staging-v2-ark-3</code>, <code>staging-v2-mark-3</code>, <code>Syncio-Staging-Tier2-1</code>; staging EB worker <code>ip-172-31-30-195</code>. Query builder editor = click the <code>FROM</code> line at ~(160,209) after the page fully loads, else keystrokes hit NR shortcuts.</li><li><strong>Staging DB:</strong> Apoorva has TablePlus "staging" → <code>staging-db-core…</code>/<code>syncio_core_db</code>. I can't see TablePlus; she runs SQL and pastes results. First connection showed non-staging data (ids 42829/42830) — always verify with known ids (4328 apoorva-local-destination, 5652 us-500-error) before UPDATEs. Advised Safe Mode = Alert + orange colour.</li></ul><div class="work-tag open">STILL OPEN</div><ul class="work-list"><li>ENG-5201 QA (store/order deletions + Woo stores), ENG-5220 retry QA (needs a failing push + Horizon/tinker; Horizon 403 for me), ENG-5203 (above).</li><li>App stability checklist items (prod smoke stores? release-watch owner?) unanswered; then communicate BFCM testing areas to the team.</li><li>Sentry fixes VUE-38/39/3C need a card number. <strong>VUE-3E (11 Nov, saved for a card):</strong> ShippingTypeTags.vue:63 Update button calls <code>updateTag(tag)</code> but signature is <code>(event, tag)</code> → <code>tag.editMode</code> on undefined; pre-existing since v7.5.0. Fix: <code>updateTag(tag)</code> = trim <code>tag.value</code> + <code>editMode = false</code>, Enter calls it the same way; add case to ShippingTypeTags.test.js. Card for the swapped-args order-update re-push (<code>ProcessOrderUpdateFromDestinationToSourceV2.php:188</code>, V1 <code>:143</code>). BFCM QA-card sprint id 587 hardcoded — update each cycle.</li><li>ENG-5231 parked (BE <code>0692d233</code>, FE <code>ccedbfb0</code>); FE base may need moving to the current release.</li><li>Rulings not to re-raise: buffer off after quantity edit skips <code>inventory-safety-net-add</code>; ENG-5108 modal 20px gap; on-hold #1019 no card; keep shared Pagination.vue; leave the products.spec.js flake. <strong>13 Nov: DB lockdown live Mon 16 Nov</strong> (DB reachable only from the app + trusted VMs; devs tunnel via a VM). Tally reads the DB directly (<code>SYNCIO_DB_URL</code>, read-only user) from a Cloudflare Worker with no fixed IP, so it breaks unless Cloudflare Tunnel + Hyperdrive (or API endpoints instead). Asked in the thread; waiting for an answer. Playwright has no DB dependency. Staging TablePlus QA (token breaks) may need the VM tunnel. <strong>13 Nov QA results:</strong> ENG-5262/5220 PASS (#1005 API-error path, no TypeError; retry ladder not reproducible by hand — covered by PHPUnit). ENG-5201 PASS on card's QA section (scenarios 1–4, 6; 5/7 tests) after #205 (042565cd). Follow-up card text given (not raised by me): MLV2 add-line after source order deleted crashes at :455; ProcessOrderRefundV2 null target_store "platform" (~:435, prod 4/7d); Woo "Invalid ID" at ERROR. New card candidate confirmed: source auth failure → "No Mapped Line items", never retried (#1007). Staging leftovers left as-is (Apoorva: "let it be"): lang-ds T-shirt stock, QA orders #1007–#1010, new lang-ds product. lang-ds token restored. <strong>ENG-5271:</strong> 6ba255d4 pushed (Plan &amp; Billing, Catalogs @prod, Woo sync). Second batch (Woo token sign-in for lina 3656/3657 + specs) uncommitted in worktree agent-ad6f21b40ac8d5385, reviewed + fixed; HOLD until Apoorva confirms staging sys_remote_apps id 1 app_key ≠ production's. <strong>ENG-5271 (13 Nov, later):</strong> branch feature/ENG-5271-prod-smoke-specs now 6ba255d4 → 5395b150 (Woo token sign-in, lina 3656/3657; staging key confirmed staging-only) → 19edbdaf (Account Settings dialogs @prod, skip on prod until a Universal/Woo prod store exists). Email-invitation spec dropped (no in-app invitation flow; would send real email). No PR opened. Apoorva is the dedicated QA: devs only create QA cards from Key Testing Areas - Staging; BFCM Slack message drafted for her to post. <strong>ENG-5271 verified 13 Nov 14:20:</strong> 27 passed, 1 skipped (coachmark: not a first-run store), 0 flaky on staging-app at 19edbdaf. Local <code>.env.e2e</code> points at a local BE and lacks the source/universal/Woo store URLs, so a plain local run skips 23 and Woo token sign-in 500s. Run with inline <code>E2E_BASE_URL=https://staging-app.syncio.io E2E_ENVIRONMENT=staging</code> plus TEST_SOURCE (apoorva-local-source-3), TEST_UNIVERSAL (release7universalstore) and both TEST_WOO (lina) URLs. <strong>New cards → backlog (Apoorva 13 Nov):</strong> VUE-3E shipping-tag edit, Woo order re-syncs unrelated stores (ProcessDestinationOrderToSourceV2:418, no source_store filter), hybrid migration null getOrdersByIds (:433). Drafts + QA written in-session; no work before BF. Also still to raise: source auth failure → "No Mapped Line items", never retried (#1007); ENG-5201 follow-ups (MLV2 add-line :455, ProcessOrderRefundV2 null target_store ~:435 prod 4/7d). <strong>BFCM bug thread decisions (13 Nov, eng_general 9 Nov thread; scores were mine, Apoorva re-scored with me):</strong> Before BF: ENG-5207 [4] nice-to-have (Fei; any retry needs an existing-refunds check, double-refund risk), ENG-5215 [2] be#203. In investigation: ENG-5058 [4] push-whole-order is intended (Fei 15:59); real bug = product deletion leaves ghost mappers. After BF: ENG-5150 [3], 5157 [2], 5163 [2, Apoorva's own finding], 5156 [2], 3870 [1]. ESC-2224 done; ESC-2228 [2] parked (Rayman: expected ML, product call). No branch fixes any of them (checked all remotes). ENG-5150 and ENG-5274 share a root cause (Woo ids matched without store) — fix together after BF. Ledger NOT updated (Apoorva: "leave it"); a dry run showed deferring 5150/5163/ESC-2228 would move Catalogs 🔴→🟠; ENG-5150 is misfiled under Catalogs (really Product sync). <strong>Ledger updated 13 Nov (Apoorva yes, after all):</strong> ENG-5207, 5150, 5163, ESC-2228 marked <code>deferred: after BF</code> (5163/5207 pinned auto=false), republished with --no-collect; Catalogs 🔴→🟠. Backup ledger2.backup-20261113.json. ENG-5207 re-triaged after BF: NR 30d = 52 source refund 409s, 0 legacy orders/cancelled vs 37,966 V2 — Fei's "migrate from legacy" doesn't apply; reply drafted for Apoorva. <strong>ENG-5271 later (13 Nov):</strong> 7e434e98 tags Catalogs Flow 6 (bef862ea) + Woo Flow 4 (2af992c9); 0e4ff043 adds staging specs for Catalogs Flows 3/4/5 + Platform Flows 7/8 (new onboarding.spec.js), age-based catalog sweeps (own catalog first, 404 ok for leftovers), shared fixtures (openTestPairConnection, appApiHeaders, isApiRequest). Reviewed, 37/37 x2 on staging, staging clean. After merge: Playwright 48/134 flows, UI-need 36/51. No test possible for fdf29e94 (10k share limit — nothing enforces it) and 34a153f2 (Universal metafield restriction — silent BE) → Apoorva to decide in QA app. Fully-automated score = 54% of 91 real flows (69% incl. [AUTOMATED] rows). Still no PR opened.</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">🩺</span>
+                <span class="label">Feature stability — overnight</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Rating changes · 1</div><ul class="work-list"><li><strong>Order Push Settings (Shopify only)</strong> 🟢 Stable → 🟡 Watch <span style="color:#78716c">(1 unresolved bug from the last 30 days)</span></li></ul><div class="work-tag open">New bugs · 10</div><ul class="work-list"><li><a href="https://syncio.atlassian.net/browse/ENG-5280" target="_blank" rel="noopener">ENG-5280</a> Inventory / Multi-Location / OOS-BIS: WooCommerce stock updates that time out after 60 seconds are marked do-not-retry and dropped.</li><li><a href="https://syncio.atlassian.net/browse/ENG-5279" target="_blank" rel="noopener">ENG-5279</a> Platform / infra: Workers can start with an empty Tier2 queue group list when the cache key expires between has() and get().</li><li><a href="https://syncio.atlassian.net/browse/ENG-5278" target="_blank" rel="noopener">ENG-5278</a> Platform / infra: The admin:order-clean-up scheduled command reports exit code 1 on every successful run.</li><li><a href="https://syncio.atlassian.net/browse/ENG-5277" target="_blank" rel="noopener">ENG-5277</a> Orders (Shopify only): Tracking sync picks the wrong fulfillment order on split DS orders and creates no fulfillment on the destination.</li><li><a href="https://syncio.atlassian.net/browse/ENG-5274" target="_blank" rel="noopener">ENG-5274</a> WooCommerce: A Woo order re-syncs products of unrelated stores that share the same Woo product id.</li><li><a href="https://syncio.atlassian.net/browse/ENG-5273" target="_blank" rel="noopener">ENG-5273</a> Order Push Settings (Shopify only): Editing a shipping type tag in Order Push Settings throws because updateTag gets its arguments in the wrong order.</li><li><a href="https://syncio.atlassian.net/browse/ENG-5272" target="_blank" rel="noopener">ENG-5272</a> Orders (Shopify only): Order refund and the order-edit add-line step crash when the source store or source order no longer exists.</li><li>#cs_ticket_discussions Orders (Shopify only): With multi-location on, pushed orders do not split fulfillment by each line item's stock location.</li><li>#cs_ticket_discussions Orders (Shopify only): Order fulfillment goes wrong when the source store's fulfillment location differs from what was expected.</li><li>#cs_ticket_discussions Bulk import &amp; sync: A full store resync skips title updates on some mapped products, while a per-product resync applies them.</li></ul><div class="work-tag done">Moved to done · 2</div><ul class="work-list"><li><a href="https://syncio.atlassian.net/browse/ENG-5201" target="_blank" rel="noopener">ENG-5201</a> Orders (Shopify only): Order sync jobs crash on null stores, orders or mappings, so order updates never reach the other store. <span style="color:#78716c">(Done-RTD)</span></li><li><a href="https://syncio.atlassian.net/browse/ESC-2229" target="_blank" rel="noopener">ESC-2229</a> Orders (Shopify only): Every order push from buyFSA to Vim &amp; Vigr has failed since 20/10. <span style="color:#78716c">(Done - Customer Contacted)</span></li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Direct Cranes — Personal</span>
+            </div>
+            <div class="content"><div class="work-tag progress">DIRECT CRANES — LATEST</div><div class="work-items"><strong>20 Oct 2026 evening — Docket templates (paid, $880) ON TEST, UNCOMMITTED.</strong> Migrations 0036–0038 on direct-cranes-test only; code in scratchpad worktrees branch <code>docket-templates</code>. See direct-cranes-docket-templates.</div><div class="work-tag open">DIRECT CRANES — STILL OPEN</div><ul class="work-list"><li>Handover's office-completion entry still says "Not released as at 14 Oct" (it is live); fix with the next planner commit.</li><li>Sachin + Stephanie accepting GitHub owner invites; written reference from Sachin (quotation clause 4) + permission to show the apps.</li><li>Never tried on a real phone: passkeys; camera steps; unsent work surviving a closed app.</li><li>Accepted nits: useAdminStore.load no latest-request guard; docket sync-auth.mjs ignores --check. Custom domains deferred.</li><li><strong>Syncio:</strong> see daily-context-syncio.</li></ul></div>
+        </div>
+  </div>
+  <div class="footer">Generated by Hermes · 08:01</div>
+</div>
+<script>
+(function() {
+    var gate = document.getElementById('pwdGate');
+    var page = document.getElementById('summaryPage');
+    var input = document.getElementById('pwdInput');
+    var btn = document.getElementById('pwdBtn');
+    var error = document.getElementById('pwdError');
+    var PASSWORD = 'hermes';
+
+    function tryUnlock() {
+        var val = input.value;
+        if (val === PASSWORD) {
+            gate.style.display = 'none';
+            page.style.display = 'block';
+        } else {
+            error.textContent = 'Wrong password';
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') tryUnlock();
+    });
+    input.focus();
+})();
+</script>
+</body>
+</html>
