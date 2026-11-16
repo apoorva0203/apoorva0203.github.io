@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☀️ Morning Summary</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%); color: #1a1a2e; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 600px; margin: 0 auto 20px; background: #ffffff; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 24px 28px; position: relative; overflow: hidden; }
+  .header::after { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+  .header::before { content: ''; position: absolute; bottom: -30px; left: 20%; width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+  .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .header .date { font-size: 13px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
+  .body { padding: 16px 16px 20px; }
+  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; margin: 0 0 14px 0; min-width: 0; }
+  .section:last-child { margin-bottom: 0; }
+
+  /* Desktop: two columns, work sections full width on top */
+  @media (min-width: 768px) {
+    body { padding: 24px; }
+    .page { max-width: 1100px; }
+    .body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 24px 24px; align-items: start; }
+    .section { margin: 0; }
+    .section-work, .section-gh, .section-slack { grid-column: 1 / -1; }
+    .section-work { order: -1; }
+    .header { padding: 28px 32px; }
+    .header h1 { font-size: 26px; }
+    .footer { padding: 12px 24px; }
+  }
+  .section-cal { border-left: 4px solid #3b82f6; }
+  .section-rem { border-left: 4px solid #10b981; }
+  .section-email { border-left: 4px solid #f59e0b; }
+  .section-slack { border-left: 4px solid #8b5cf6; }
+  .section-work { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-color: #fcd34d; }
+  .section-gh { border-left: 4px solid #ef4444; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+  .section-header .icon { font-size: 16px; }
+  .section-header .label { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: #475569; }
+  .content { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #334155; }
+  .content ul { white-space: normal; margin: 0 0 12px; padding-left: 18px; }
+  .content ul:last-child { margin-bottom: 0; }
+  .content li { margin: 0 0 6px; }
+  .content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: rgba(15,23,42,0.06); padding: 1px 5px; border-radius: 4px; }
+  .work-list { font-size: 13px; line-height: 1.55; color: #44403c; }
+  .content a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+  .content a:hover { text-decoration: underline; }
+  .content .mention { color: #8b5cf6; font-weight: 500; }
+  .empty { color: #94a3b8; font-style: italic; font-size: 13px; text-align: center; padding: 8px 0; }
+  .work-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .work-tag.done { background: #dcfce7; color: #166534; }
+  .work-tag.open { background: #fee2e2; color: #991b1b; }
+  .work-tag.progress { background: #fef9c3; color: #854d0e; }
+  .work-tag.mention { background: #fef3c7; color: #b45309; border: 1px dashed #f59e0b; }
+  .work-items { white-space: normal; font-size: 13px; line-height: 1.55; color: #44403c; margin: 0 0 12px; }
+  .work-items:last-child { margin-bottom: 0; }
+  .footer { text-align: center; padding: 10px 22px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+  .pwd-gate { position: fixed; inset: 0; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .pwd-gate .box { background: #ffffff; border-radius: 16px; padding: 36px 32px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 300px; width: 90%; }
+  .pwd-gate h2 { margin: 0 0 4px; font-size: 20px; color: #1a1a2e; font-weight: 700; }
+  .pwd-gate .lock-icon { font-size: 40px; margin-bottom: 8px; display: block; }
+  .pwd-gate p { font-size: 13px; color: #64748b; margin: 0 0 24px; }
+  .pwd-gate input { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; box-sizing: border-box; margin-bottom: 14px; transition: border-color 0.15s; }
+  .pwd-gate input:focus { outline: none; border-color: #4f46e5; }
+  .pwd-gate button { width: 100%; padding: 11px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .pwd-gate button:hover { background: #4338ca; }
+  .pwd-gate .error { color: #ef4444; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 500; }
+  .page { display: none; }
+</style>
+</head>
+<body>
+<div class="pwd-gate" id="pwdGate">
+  <div class="box">
+    <span class="lock-icon">🔒</span>
+    <h2>Locked</h2>
+    <p>Enter your morning summary password</p>
+    <input type="password" id="pwdInput" placeholder="Password" autocomplete="off">
+    <button id="pwdBtn">Unlock</button>
+    <div class="error" id="pwdError"></div>
+  </div>
+</div>
+<div class="page" id="summaryPage">
+  <div class="header">
+    <h1>☀️ Morning Summary</h1>
+    <div class="date">Tuesday, November 17</div>
+  </div>
+  <div class="body">
+    
+        <div class="section section-cal">
+            <div class="section-header">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </div>
+            <div class="content"><p class="empty">No calendar events today</p></div>
+        </div>
+        <div class="section section-email">
+            <div class="section-header">
+                <span class="icon">📧</span>
+                <span class="label">Email</span>
+            </div>
+            <div class="content">• $8,000,000 Oz Lotto is tonight — Oz Lotteries
+• New Tender Notifications — Tenders VIC
+• Insta-Click Day Is Here! 🥳 Make ALL Your Clicks at Once. — The Animal Rescue Site Reminder
+• Important Update | Enhancing Your Login Experience with Trusted Devices - Techgene Solutions LLC — Mohan Sai Veluru
+• Flowers to convey your heartfelt message! 💚 — Pearsons Florist</div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub PRs</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Open PRs with pending review</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/177" target="_blank" rel="noopener">#177 ENG-5281 Count the marketplace bio in bytes, like the BE</a> — 👀 Review: jaiwalker, Suharsh329 (1 commits, +38/-1)</li><li><a href="https://github.com/syncio/syncio-fe/pull/176" target="_blank" rel="noopener">#176 ENG-5282 Treat a null product list from store search as no results</a> — 👀 Review: jaiwalker (1 commits, +8/-1)</li><li><a href="https://github.com/syncio/syncio-fe/pull/175" target="_blank" rel="noopener">#175 [ENG-5271] Playwright specs for the production smoke checks</a> — 👀 Review: Suharsh329 (7 commits, +964/-73)</li></ul></div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">My PRs — feedback</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Since Mon 08:00</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/177" target="_blank" rel="noopener">FE #177 ENG-5281 Count the marketplace bio in bytes, like the BE</a> — 🆕 4 new comments (bot ×4)</li><li><a href="https://github.com/syncio/syncio-fe/pull/176" target="_blank" rel="noopener">FE #176 ENG-5282 Treat a null product list from store search as no results</a> — 🆕 2 new comments (bot ×2)</li><li><a href="https://github.com/syncio/syncio-fe/pull/175" target="_blank" rel="noopener">FE #175 [ENG-5271] Playwright specs for the production smoke checks</a> — 🆕 6 new comments (bot ×6)</li></ul></div>
+        </div>
+        <div class="section section-slack">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">Slack</span>
+            </div>
+            <div class="content"><div class="work-tag progress">82 channels · last 24h</div><ul class="work-list"><li><strong>#cs_general</strong> ⚠️ Heads up: Intercom is down in the US region (our workspace) since about 6:10am AEDT. Intercom has confirmed it on their official status page and is still investigating the cause. Fin and the…</li><li><strong>#cs_ticket_discussions</strong> <span class="mention">@U02DSB27W2Z</span> <span class="mention">@U03DKE5B2KX</span> Update on today’s support : <a href="https://syncio.atlassian.net/browse/ESC-2240?focusedCommentId=47619" target="_blank" rel="noopener">syncio.atlassian.net/browse/ESC-2240?…</a></li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#160] …</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#160] …</li><li><strong>#team_random</strong> Saturday : We had power cut from 9am to 6pm - post 7pm power surge happened and my toster and bug zapper are gone, everything checked-out fine, but in the morning my logic camera is not working wired.…</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Syncio — Professional</span>
+            </div>
+            <div class="content"><div class="work-tag done">Tue 17 Nov</div><ul class="work-list"><li>Review requests open: <strong>be#214 (ENG-5284, Nainesh, EventBridge legacy gate flags) — new, no reviews yet</strong>. be#202 (Suharsh, ENG-5239) — Apoorva commented earlier, PR updated 16 Nov, check for new commits. be#203 + be#200 already have 2+ other reviewers → skip (feedback-skip-review-if-two-reviewers).</li></ul><div class="work-tag open">STILL OPEN</div><ul class="work-list"><li><strong>Mon 23 Nov: REMIND Apoorva — Reorbit follow-ups</strong> for the 40 emails sent 16 Nov (list in <code>~/reorbit-drafts-16nov.md</code>): check which got no reply / weren't opened, draft ONE short follow-up each, then close quietly. Apoorva asked to be reminded ("else i will forget"). Also daily: 5 new Reorbit contacts.</li><li><strong>Fri 20 Nov (Sentry's 30th day in prod): bring up a draft of a message on Sentry's impact</strong> — bugs fixed that nobody had reported before Sentry caught them; conclusion: stay on the free single-seat Developer plan. Sentry live in prod since 21 Oct (v7.6.1). Evidence: VUE-2A (fe#160), VUE-2F, VUE-2J (ENG-5233), ENG-5232/5234/5235 (check which came from Sentry), VUE-3E (backlog card), ENG-5281 (VUE-3N), ENG-5282 (VUE-16).</li><li>ENG-5283 questions for Lina/Antonio — <strong>Apoorva already posted them as Figma comments (17 Nov); don't re-raise, just check replies</strong>: first-time profile save "Return to Marketplace" → back to Product Finder?; Custom transit time input + what None shows; 5–8 vs Figma 6~8; Status column always "Draft" — keep or hide?; show "incomplete" hint on drafts?; Select products dialog vs Catalogs picker (Apoorva asked). Blocker: cost price not stored in BE (Suharsh).</li><li>Still to raise (drafted earlier, not raised): source auth failure → "No Mapped Line items" never retried (#1007); ENG-5201 follow-ups; <code>missing_metafield_definitions</code> label misnomer; OrderApiController.php:247 <code>load()</code> on null → 500; ML <code>moveFulfillmentOrder</code> failures; Intercom launcher covers Activity Centre last-page button; hourly staging ASG health-check ERRORs.</li><li>ENG-5280 (Nainesh's): Woo stock timeouts dropped; suggested after BF; Apoorva undecided.</li><li>ENG-5271 untestable commits fdf29e94 (10k share limit), 34a153f2 (Universal metafield restriction) → Apoorva decides in QA app.</li><li>Sentry watch: VUE-3K (web-vitals <code>.at()</code>; if repeats add <code>browser.sentry-cdn.com</code> to denyUrls), VUE-3M (stale session 400), VUE-6 PrimeVue focustrap on /stores, VUE-V Firefox /login. VUE-38/39/3C need a card number. Access: Chrome tab <code>fetch('/api/0/organizations/syncio-2b/...')</code>, strip <code>?…</code>.</li><li>Backlog cards (after BF): VUE-3E shipping-tag arg swap, ENG-5274 Woo order re-sync (with ENG-5150), hybrid migration null getOrdersByIds; card for swapped-args order-update re-push (<code>ProcessOrderUpdateFromDestinationToSourceV2.php:188</code>).</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">🩺</span>
+                <span class="label">Feature stability — overnight</span>
+            </div>
+            <div class="content"><div class="work-tag open">New bugs · 3</div><ul class="work-list"><li><a href="https://syncio.atlassian.net/browse/ENG-5284" target="_blank" rel="noopener">ENG-5284</a> Product sync: The EventBridge products/update gate ignores the HasProductMappers flag and drops product updates for source stores with no mappers. 🔺</li><li><a href="https://syncio.atlassian.net/browse/ENG-5282" target="_blank" rel="noopener">ENG-5282</a> Product sync: The Products "Map with Existing" search crashes when the backend returns null products after a failed store search.</li><li><a href="https://syncio.atlassian.net/browse/ENG-5281" target="_blank" rel="noopener">ENG-5281</a> Marketplace / CoCo Profile: A Marketplace bio passes the 140-character check in the app but the backend rejects it because it counts bytes.</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Direct Cranes — Personal</span>
+            </div>
+            <div class="content"><div class="work-tag progress">DIRECT CRANES — LATEST</div><div class="work-items"><strong>20 Oct 2026 evening — Docket templates (paid, $880) ON TEST, UNCOMMITTED.</strong> Migrations 0036–0038 on direct-cranes-test only; code in scratchpad worktrees branch <code>docket-templates</code>. See direct-cranes-docket-templates.</div><div class="work-tag open">DIRECT CRANES — STILL OPEN</div><ul class="work-list"><li>Handover's office-completion entry still says "Not released as at 14 Oct" (it is live); fix with the next planner commit.</li><li>Sachin + Stephanie accepting GitHub owner invites; written reference from Sachin (quotation clause 4) + permission to show the apps.</li><li>Never tried on a real phone: passkeys; camera steps; unsent work surviving a closed app.</li><li>Accepted nits: useAdminStore.load no latest-request guard; docket sync-auth.mjs ignores --check. Custom domains deferred.</li><li><strong>Syncio:</strong> see daily-context-syncio.</li></ul></div>
+        </div>
+  </div>
+  <div class="footer">Generated by Hermes · 08:00</div>
+</div>
+<script>
+(function() {
+    var gate = document.getElementById('pwdGate');
+    var page = document.getElementById('summaryPage');
+    var input = document.getElementById('pwdInput');
+    var btn = document.getElementById('pwdBtn');
+    var error = document.getElementById('pwdError');
+    var PASSWORD = 'hermes';
+
+    function tryUnlock() {
+        var val = input.value;
+        if (val === PASSWORD) {
+            gate.style.display = 'none';
+            page.style.display = 'block';
+        } else {
+            error.textContent = 'Wrong password';
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') tryUnlock();
+    });
+    input.focus();
+})();
+</script>
+</body>
+</html>
