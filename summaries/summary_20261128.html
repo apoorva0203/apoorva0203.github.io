@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>☀️ Morning Summary</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%); color: #1a1a2e; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 600px; margin: 0 auto 20px; background: #ffffff; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 24px 28px; position: relative; overflow: hidden; }
+  .header::after { content: ''; position: absolute; top: -40px; right: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+  .header::before { content: ''; position: absolute; bottom: -30px; left: 20%; width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+  .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .header .date { font-size: 13px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
+  .body { padding: 16px 16px 20px; }
+  .section { padding: 14px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; margin: 0 0 14px 0; min-width: 0; }
+  .section:last-child { margin-bottom: 0; }
+
+  /* Desktop: two columns, work sections full width on top */
+  @media (min-width: 768px) {
+    body { padding: 24px; }
+    .page { max-width: 1100px; }
+    .body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 24px 24px; align-items: start; }
+    .section { margin: 0; }
+    .section-work, .section-gh, .section-slack { grid-column: 1 / -1; }
+    .section-work { order: -1; }
+    .header { padding: 28px 32px; }
+    .header h1 { font-size: 26px; }
+    .footer { padding: 12px 24px; }
+  }
+  .section-cal { border-left: 4px solid #3b82f6; }
+  .section-rem { border-left: 4px solid #10b981; }
+  .section-email { border-left: 4px solid #f59e0b; }
+  .section-slack { border-left: 4px solid #8b5cf6; }
+  .section-work { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-color: #fcd34d; }
+  .section-gh { border-left: 4px solid #ef4444; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+  .section-header .icon { font-size: 16px; }
+  .section-header .label { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: #475569; }
+  .content { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #334155; }
+  .content ul { white-space: normal; margin: 0 0 12px; padding-left: 18px; }
+  .content ul:last-child { margin-bottom: 0; }
+  .content li { margin: 0 0 6px; }
+  .content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: rgba(15,23,42,0.06); padding: 1px 5px; border-radius: 4px; }
+  .work-list { font-size: 13px; line-height: 1.55; color: #44403c; }
+  .content a { color: #4f46e5; text-decoration: none; font-weight: 500; }
+  .content a:hover { text-decoration: underline; }
+  .content .mention { color: #8b5cf6; font-weight: 500; }
+  .empty { color: #94a3b8; font-style: italic; font-size: 13px; text-align: center; padding: 8px 0; }
+  .work-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .work-tag.done { background: #dcfce7; color: #166534; }
+  .work-tag.open { background: #fee2e2; color: #991b1b; }
+  .work-tag.progress { background: #fef9c3; color: #854d0e; }
+  .work-tag.mention { background: #fef3c7; color: #b45309; border: 1px dashed #f59e0b; }
+  .work-items { white-space: normal; font-size: 13px; line-height: 1.55; color: #44403c; margin: 0 0 12px; }
+  .work-items:last-child { margin-bottom: 0; }
+  .footer { text-align: center; padding: 10px 22px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+  .pwd-gate { position: fixed; inset: 0; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .pwd-gate .box { background: #ffffff; border-radius: 16px; padding: 36px 32px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 300px; width: 90%; }
+  .pwd-gate h2 { margin: 0 0 4px; font-size: 20px; color: #1a1a2e; font-weight: 700; }
+  .pwd-gate .lock-icon { font-size: 40px; margin-bottom: 8px; display: block; }
+  .pwd-gate p { font-size: 13px; color: #64748b; margin: 0 0 24px; }
+  .pwd-gate input { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; box-sizing: border-box; margin-bottom: 14px; transition: border-color 0.15s; }
+  .pwd-gate input:focus { outline: none; border-color: #4f46e5; }
+  .pwd-gate button { width: 100%; padding: 11px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .pwd-gate button:hover { background: #4338ca; }
+  .pwd-gate .error { color: #ef4444; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 500; }
+  .page { display: none; }
+</style>
+</head>
+<body>
+<div class="pwd-gate" id="pwdGate">
+  <div class="box">
+    <span class="lock-icon">🔒</span>
+    <h2>Locked</h2>
+    <p>Enter your morning summary password</p>
+    <input type="password" id="pwdInput" placeholder="Password" autocomplete="off">
+    <button id="pwdBtn">Unlock</button>
+    <div class="error" id="pwdError"></div>
+  </div>
+</div>
+<div class="page" id="summaryPage">
+  <div class="header">
+    <h1>☀️ Morning Summary</h1>
+    <div class="date">Saturday, November 28</div>
+  </div>
+  <div class="body">
+    
+        <div class="section section-cal">
+            <div class="section-header">
+                <span class="icon">📅</span>
+                <span class="label">Calendar</span>
+            </div>
+            <div class="content">Could not read Calendar: 140:705: execution error: Calendar got an error: Application isn’t running. (-600)</div>
+        </div>
+        <div class="section section-email">
+            <div class="section-header">
+                <span class="icon">📧</span>
+                <span class="label">Email</span>
+            </div>
+            <div class="content">• New Tender Notifications — Tenders VIC
+• $6,000,000 TattsLotto is tonight! — Oz Lotteries
+• Everything You Need In ONE KIT, SAVE 30% 🎁✨ — Huda Beauty
+• Payment due reminder — American Express
+• STOREWIDE SALE ENDS TOMORROW! — Bed Bath &amp; Beyond NZ</div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub PRs</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Open PRs with pending review</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/191" target="_blank" rel="noopener">#191 test(ENG-5283): Playwright specs and coverage table for Product Finder</a> — 👀 Review: Suharsh329, jaiwalker (3 commits, +826/-0)</li><li><a href="https://github.com/syncio/syncio-fe/pull/190" target="_blank" rel="noopener">#190 feat(ENG-5283): store profile rebuild and dashboard banners</a> — 👀 Review: Suharsh329, jaiwalker (3 commits, +1726/-874)</li><li><a href="https://github.com/syncio/syncio-fe/pull/189" target="_blank" rel="noopener">#189 feat(ENG-5283): Product Finder product lists</a> — 👀 Review: Suharsh329, jaiwalker (5 commits, +9598/-44)</li><li><a href="https://github.com/syncio/syncio-fe/pull/188" target="_blank" rel="noopener">#188 feat(ENG-5283): Sonner toasts and shared shell updates</a> — 👀 Review: Suharsh329, jaiwalker (4 commits, +396/-247)</li><li><a href="https://github.com/syncio/syncio-fe/pull/187" target="_blank" rel="noopener">#187 feat(ENG-5283): shadcn UI components and design tokens for Product Finder</a> — 👀 Review: Suharsh329, jaiwalker (5 commits, +2811/-55)</li><li><a href="https://github.com/syncio/syncio-fe/pull/186" target="_blank" rel="noopener">#186 [ENG-5322] Check connection in Account Settings for Woo stores</a> — 👀 Review: Suharsh329 (6 commits, +693/-1)</li><li><a href="https://github.com/syncio/syncio-fe/pull/185" target="_blank" rel="noopener">#185 Chore/playwright coverage gaps</a> — 💬 Reviewed by: Suharsh329 (10 commits, +1244/-77)</li></ul></div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">My PRs — feedback</span>
+            </div>
+            <div class="content"><div class="work-tag progress">Since Fri 08:00</div><ul class="work-list"><li><a href="https://github.com/syncio/syncio-fe/pull/191" target="_blank" rel="noopener">FE #191 test(ENG-5283): Playwright specs and coverage table for Product Finder</a> — 🆕 6 new comments (bot ×6)</li><li><a href="https://github.com/syncio/syncio-fe/pull/190" target="_blank" rel="noopener">FE #190 feat(ENG-5283): store profile rebuild and dashboard banners</a> — 🆕 7 new comments (bot ×7)</li><li><a href="https://github.com/syncio/syncio-fe/pull/189" target="_blank" rel="noopener">FE #189 feat(ENG-5283): Product Finder product lists</a> — 🆕 5 new comments (bot ×5)</li><li><a href="https://github.com/syncio/syncio-fe/pull/188" target="_blank" rel="noopener">FE #188 feat(ENG-5283): Sonner toasts and shared shell updates</a> — 🆕 7 new comments (bot ×7)</li><li><a href="https://github.com/syncio/syncio-fe/pull/187" target="_blank" rel="noopener">FE #187 feat(ENG-5283): shadcn UI components and design tokens for Product Finder</a> — 🆕 10 new comments (bot ×10)</li></ul></div>
+        </div>
+        <div class="section section-gh">
+            <div class="section-header">
+                <span class="icon">🔗</span>
+                <span class="label">GitHub Mentions</span>
+            </div>
+            <div class="content"><div class="work-tag mention">MENTIONS</div><ul class="work-list"><li>🔔 <a href="https://github.com/syncio/syncio-fe/pull/186" target="_blank" rel="noopener">#186 [ENG-5322] Check connection in Account Settings for Woo stores</a> <span style="font-size:11px;color:#94a3b8;">(mentioned)</span></li><li>🔔 <a href="https://github.com/syncio/syncio-be/pull/228" target="_blank" rel="noopener">#228 [ENG-5322] Woo connection check: reachability, API key and webhooks</a> <span style="font-size:11px;color:#94a3b8;">(mentioned)</span></li></ul></div>
+        </div>
+        <div class="section section-slack">
+            <div class="section-header">
+                <span class="icon">💬</span>
+                <span class="label">Slack</span>
+            </div>
+            <div class="content"><div class="work-tag progress">85 channels · last 24h</div><ul class="work-list"><li><strong>#cs_knowledge_base</strong> LSKD update: sale traffic is on, but so far server are green</li><li><strong>#cs_ticket_discussions</strong> <span class="mention">@Nainesh</span> if you are still up. Could you check this support? • <a href="https://syncio.atlassian.net/browse/ESC-2249" target="_blank" rel="noopener">[Ticket] 27/11/2026 - Inventory not syncing to a DS</a> • Unusual case where the DS is no…</li><li><strong>#cs_ticket_discussions</strong> Hi <span class="mention">@Rayman</span> can we have a chat about this card. …</li><li><strong>#design_general</strong> <span class="mention">@Lina</span> <span class="mention">@Suharsh</span> <span class="mention">@Appu</span> I was looking into the Built for Shopify requirements doc and was wondering if we could surface some basic metrics on the homepage for the DS app, e.g. rev…</li><li><strong>#design_general</strong> I feel like this is the next frontier of design… The CEO of <a href="https://www.linkedin.com/company/anthropicresearch/" target="_blank" rel="noopener">Anthropic</a> thinks chat is temporary. Dario sat down with Stripe’s John Collison and tal…</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-be</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#224] …</li><li><strong>#eng_general</strong> <strong>Pending review on syncio/syncio-orb</strong> · <a href="https://github.com/organizations/syncio/settings/reminders/102011" target="_blank" rel="noopener">Manage reminder</a> [#1] …</li><li><strong>#growth_general</strong> Btw I wanted to highlight how strongly Syncio is ranking in our categories since delisting-gate. Every current category ranking is higher than the 2026 average, with Operations and Inventory *peaking …</li><li><strong>#team_random</strong> Hi Antonio, it’s Antonio :joy:</li><li><strong>#team_random</strong> My new favourite quote about discipline from the marathon GOAT</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Syncio — Professional</span>
+            </div>
+            <div class="content"><div class="work-tag done">Fri 27 Nov</div><ul class="work-list"><li><strong>Apoorva is NOT on call today; her next BFCM on-call is Wed 2 Dec.</strong> The Brandland T1 storm follow-up waits until then (or Jai).</li><li>QA app sunset (project-qa-app-sunset); coverage goes in SYNCIO.md.</li><li>ENG-5283 rebased onto main v7.6.7 locally (backup branch <code>backup/ENG-5283-pre-rebase-27nov</code> = old b8792d83); one conflict in MarketplaceSettingsView bio check, kept the branch's <code>bioBytes</code> computed. All gates green. Toasts added (delete success, "Product list saved" for a published list), uncommitted; needs a force-push once approved.</li><li>Product Finder Playwright ran locally for the first time: 27/27 pass with <code>TEST_SOURCE_STORE_URL=apoorva-local-source-3.myshopify.com</code> (not set in her .env.e2e; <code>.env.e2e</code> symlinked into the ENG-5283-e2e worktree).</li><li>Figma (27 Nov): Lina answered the last open M1 question: the profile preview dialog for Product Finder waits until Milestone 4. Sticky-filter border thread settled (built: border only while stuck). No M1 Figma questions left.</li><li>PR bodies for #187–#191 written (Problem / Change / Test / QA (staging)); #187 and #191 titles tidied. syncio-orb #1 approved by Apoorva; agent-dotfiles Amp access + env var done by Apoorva; Reorbit 27 Nov drafts sent and logged.</li></ul><div class="work-tag open">STILL OPEN</div><ul class="work-list"><li><strong>Reorbit 24 Nov done</strong> (log <code>~/reorbit-drafts-24nov.md</code>): 5 new (Solar Brother is WooCommerce, not in the CRM, so its Shopify partner Lowreka f75069-34 was emailed too) + Lotza follow-up. Lowreka auto-replied (co-founder on new-baby leave): no reply; gentle follow-up ~4 Dec only if the pair is still 0 synced, open with congratulations. Next: 18 Nov batch follow-ups ~25 Nov (Orucase, KIDYWOLF, Wild &amp; Sage, Addendum Hair), 19–20 Nov batches ~26–27 Nov.</li><li><strong>ENG-5321 (Admin Playwright) — LATER, not now (Apoorva, 24 Nov).</strong> <code>syncio-admin-fe</code> signs in with the same AppAuth app token as Core (<code>{uuid, user_id, timestamp}</code> HS256 with the app key, kept in sessionStorage <code>ID_TOKEN_KEY</code> + <code>USER_ID</code>), so reuse Core's <code>appToken</code>/<code>injectSession</code>. Admin is staging only. Needs: staging Admin app key as GitHub secret, a staging staff test user id. Real writes only on test stores, undone; fake anything touching other teams' stores. Admin and Product Finder were removed from the QA app on 24 Nov (QA app is Core-only).</li><li><strong>ENG-5320 (Product Finder Playwright) — WAIT for Suharsh's reply</strong> to the heads-up before branching (Apoorva, 24 Nov). Plan: Playwright on <code>syncio-product-finder</code> with a mocked <code>window.shopify</code>; tests sign a Shopify session token (HS256, <code>coco.api_secret</code>, <code>aud</code> = coco api_key, <code>dest</code> = shop) that <code>ShopifySessionTokenAuth</code> on <code>staging-core.syncio.io</code> validates unchanged. Apoorva adds the staging PF secret as a GitHub secret; staging store with PF installed exists. Branch <code>feature/ENG-5320-...</code> off <code>main</code> once he replies. 8 QA app flows to tag.</li><li><strong>When <code>chore/playwright-coverage-gaps</code> merges to syncio-fe <code>main</code>: remind Apoorva to sunset the QA app</strong> (she announced it in the channel on 24 Nov: "The QA app has served its purpose", Core 73% now → 93% after the merge, 7 flows still need a human in the #eng_testing canvas). Check <code>gh pr list -R syncio/syncio-fe --head chore/playwright-coverage-gaps --state all</code> at session start. The channel post itself is DONE; don't redraft it.</li><li>From Fri 20: ENG-5292 / be#220 is after BF and out of the ledger (don't list as waiting). fe#182 Woo tests: lina-staging-destination-1 is Free 25/25, Lina to free room. ENG-5283 uncommitted sticky changes: redo as filters-only sticky per Antonio (22 Nov).</li><li><strong>ENG-5283 PUSHED 19 Nov (Apoorva's "push"); opening the PRs is AFTER BF (Apoorva 19 Nov: "not now after BF") — don't raise before 28 Nov. PRs not opened yet — when she opens them: bases PR1→main, PR2→PR1 branch, PR3→PR2 branch; write bodies with <code>gh pr edit --body-file</code> (merge note: all three ship together with step 3).</strong> Was: PR1 <code>feature/ENG-5283-product-finder-lists</code> 9910bb02 (base main, 14 files); PR2 <code>feature/ENG-5283-ds-focus-alignment</code> 6a11a84f (<strong>base PR1</strong>, 12 files — Apoorva: linear stack); PR3 <code>feature/ENG-5283-product-lists-page</code> 71b73315 (<strong>base PR2</strong>, 74 files, no merge commit); step 3 continues on <code>feature/ENG-5283-list-editor</code> in the ENG-5283 worktree (22 uncommitted files). Subjects <code>feat(ENG-5283): …</code> (SYNCIO.md Conventional Commits). Review: all three green, nits fixed (querySelector → template refs). <strong>Merge order: PR1 + PR3 only together with step 3</strong> (else empty tab / placeholder editor ship); PR2 can merge alone. PR descriptions drafted in the reviewer's report (re-draft when she opens PRs). loadingAction removed from the store.</li><li><strong>ENG-5283 19 Nov later:</strong> Apoorva "everything should match the design" → design batch applied (Button outline shadow, IconButton mid-alt, Tabs size axis, --ring #087AEC, placeholder scoped rule, reka Dialog for delete, TitledTooltip focus, page button, selection column KEPT as designed (no bulk action), Early access badge via PageTitle <code>badge</code>); DropdownMenu keyboard focus ring; Select options no ring; SideNavItem unchanged (matches DS). Branch 102 files → <strong>4 stacked PRs (Apoorva): 1 step-1 foundation → 2 design-system alignment → 3 Product lists page → 4 step 3</strong>; split plan being prepared, no commits without her yes. Reorbit 19 Nov: 5 sent (shop.usports, A LOT STUDIO, Revma.ca+Boutiquetco, My Store/LEGADO, Blacklight Blonde Science; <code>~/reorbit-drafts-19nov.md</code>).</li><li><strong>ENG-5283 step 2b Product lists page BUILT 19 Nov — 3 review rounds, clean</strong> (uncommitted, 77 files). Search box = vendored shadcn-vue InputGroup (Apoorva's call; Input reverted to main); placeholder grey #6C757D comes from PrimeVue theme-light.css global rule (pre-existing, accepted). Next = step 3 (create/edit page + Select products dialog). Steps 1–2 updated to the 19 Nov contract (currency, E4 all-three, E6 search/sort, keyed 422s, D13 422) — divergence check clean. Step 3 must: pass keyed 422 errors + conflicts through (assertSuccess drops them), toast a throttled create itself. Shared 429 interceptor text kept (contract wording would need a separate cross-feature card). Branch at 75 files; <strong>PR split decision: Apoorva = decide after step 3</strong> (reviewer's proposal: PR A = steps 1+2b + used table pieces; PR B stacked = steps 3+4 + pagination/Select/Checkbox/row selection). worktree node_modules is now its own <code>npm ci</code> (reka-ui@2.11.0 added). Design questions for Lina/Antonio: flags source (DS only has AU), Early access badge + Learn more URL, leading 40px selection column, Published badge / no-results empty state / delete dialog / regions popover designs; list filter waits on D12.</li></ul></div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">🩺</span>
+                <span class="label">Feature stability — overnight</span>
+            </div>
+            <div class="content">⚠️ The ledger did not run today — check: hermes cron runs c838c9703ba7</div>
+        </div>
+        <div class="section section-work">
+            <div class="section-header">
+                <span class="icon">📋</span>
+                <span class="label">Direct Cranes — Personal</span>
+            </div>
+            <div class="content"><div class="work-tag progress">DIRECT CRANES — LATEST</div><div class="work-items"><strong>20 Oct 2026 evening — Docket templates (paid, $880) ON TEST, UNCOMMITTED.</strong> Migrations 0036–0038 on direct-cranes-test only; code in scratchpad worktrees branch <code>docket-templates</code>. See direct-cranes-docket-templates.</div><div class="work-tag open">DIRECT CRANES — STILL OPEN</div><ul class="work-list"><li>Handover's office-completion entry still says "Not released as at 14 Oct" (it is live); fix with the next planner commit.</li><li>Sachin + Stephanie accepting GitHub owner invites; written reference from Sachin (quotation clause 4) + permission to show the apps.</li><li>Never tried on a real phone: passkeys; camera steps; unsent work surviving a closed app.</li><li>Accepted nits: useAdminStore.load no latest-request guard; docket sync-auth.mjs ignores --check. Custom domains deferred.</li><li><strong>Syncio:</strong> see daily-context-syncio.</li></ul></div>
+        </div>
+  </div>
+  <div class="footer">Generated by Hermes · 08:00</div>
+</div>
+<script>
+(function() {
+    var gate = document.getElementById('pwdGate');
+    var page = document.getElementById('summaryPage');
+    var input = document.getElementById('pwdInput');
+    var btn = document.getElementById('pwdBtn');
+    var error = document.getElementById('pwdError');
+    var PASSWORD = 'hermes';
+
+    function tryUnlock() {
+        var val = input.value;
+        if (val === PASSWORD) {
+            gate.style.display = 'none';
+            page.style.display = 'block';
+        } else {
+            error.textContent = 'Wrong password';
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') tryUnlock();
+    });
+    input.focus();
+})();
+</script>
+</body>
+</html>
